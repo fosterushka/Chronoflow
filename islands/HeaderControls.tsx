@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
-import { clearStorage, exportData, importData } from "./Board.tsx";
+import { clearStorage, exportData, importData } from "../utils/boardUtils.ts";
 import type { Card, Column } from "../types/index.ts";
 import ChangelogModal from "./ChangelogModal.tsx";
 

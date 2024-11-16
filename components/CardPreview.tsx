@@ -1,6 +1,6 @@
 import { JSX } from "preact";
 import { Card } from "../types/index.ts";
-import { LABELS } from "../islands/Board.tsx";
+import { LABELS } from "../utils/boardUtils.ts";
 
 interface CardPreviewProps {
   card: Card;
@@ -61,7 +61,7 @@ export default function CardPreview({
                       e.stopPropagation();
                       onLabelClick();
                     }}
-                    class={`${label.color} text-white text-xs px-2 rounded-full cursor-pointer shrink-0 inline-flex justify-center transition-all duration-200
+                    class={`${label.color} !bg-opacity-100 text-white text-xs px-2 rounded-full cursor-pointer shrink-0 inline-flex justify-center transition-all duration-200
                     ${isLabelsCollapsed ? "py-px h-[14px]" : "py-1 h-[24px]"}`}
                   >
                     <span
