@@ -35,7 +35,7 @@ export default function CardPreview({
 }: CardPreviewProps) {
   return (
     <div
-      class={`group relative rounded-lg shadow-sm hover:shadow-md transition-all duration-500 cursor-move bg-white dark:bg-gray-800/90 w-full
+      class={`group relative rounded-lg shadow-sm hover:shadow-md transition-all duration-500 cursor-move min-w-0
         ${getTimeBasedColor(card, columnId)}
         ${card.isTracking ? "ring-2 ring-emerald-500/20" : ""}`}
       draggable
@@ -46,11 +46,11 @@ export default function CardPreview({
       data-card={JSON.stringify(card)}
       data-column-id={columnId}
     >
-      <div class="px-3 py-2.5 space-y-2.5">
+      <div class="p-3 space-y-2.5 min-w-0">
         {/* Header: Labels and Delete Button */}
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-start gap-2">
           {/* Labels */}
-          <div class="flex flex-wrap gap-1.5 max-w-[85%]">
+          <div class="flex flex-wrap gap-1.5 min-w-0 flex-1">
             {card.labels.map((labelId) => {
               const label = LABELS.find((l) => l.id === labelId);
               return label
@@ -61,13 +61,13 @@ export default function CardPreview({
                       e.stopPropagation();
                       onLabelClick();
                     }}
-                    class={`${label.color} text-white text-xs px-2 rounded-full cursor-pointer min-w-[60px] inline-flex justify-center transition-all duration-200
+                    class={`${label.color} text-white text-xs px-2 rounded-full cursor-pointer shrink-0 inline-flex justify-center transition-all duration-200
                     ${isLabelsCollapsed ? "py-px h-[14px]" : "py-1 h-[24px]"}`}
                   >
                     <span
                       class={`${
                         isLabelsCollapsed ? "opacity-0" : "opacity-100"
-                      } transition-opacity duration-200`}
+                      } transition-opacity duration-200 truncate`}
                     >
                       {label.name}
                     </span>
@@ -80,7 +80,7 @@ export default function CardPreview({
           {/* Delete Button */}
           <button
             onClick={onDelete}
-            class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+            class="text-gray-400 hover:text-red-500 shrink-0 p-1"
           >
             <svg
               class="w-4 h-4"
@@ -99,15 +99,15 @@ export default function CardPreview({
         </div>
 
         {/* Content */}
-        <div class="space-y-2">
+        <div class="space-y-2 min-w-0">
           {/* Title */}
-          <h3 class="font-medium text-gray-900 dark:text-gray-100 truncate max-w-full">
+          <h3 class="font-medium text-gray-900 dark:text-gray-100 truncate">
             {card.title}
           </h3>
 
           {/* Description */}
           {card.description && (
-            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 max-w-full">
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 break-words">
               {card.description}
             </p>
           )}
@@ -116,7 +116,7 @@ export default function CardPreview({
         {/* Checklist */}
         {card.checklist?.length > 0 && (
           <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 shrink-0">
               <svg
                 class="w-4 h-4"
                 fill="none"
@@ -153,8 +153,8 @@ export default function CardPreview({
         {/* Footer */}
         <div class="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
           {/* Metadata Row */}
-          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <div class="flex items-center gap-3">
+          <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 flex-wrap gap-2">
+            <div class="flex items-center gap-3 flex-wrap">
               {/* Due Date */}
               {card.dueDate && (
                 <span class="inline-flex items-center gap-1">

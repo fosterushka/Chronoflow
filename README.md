@@ -93,6 +93,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Release Notes
 
+### v0.0.3
+
+    - Converted sidebar to sticky header for better space utilization
+    - Enhanced time tracking visualization with dynamic indicators and colors
+    - Made modal layout more compact and responsive
+    - Fixed modal state persistence issues
+    - Improved time input fields with better validation
+
 ### v0.0.2
 
 - 🎨 Improved UI layout and consistency

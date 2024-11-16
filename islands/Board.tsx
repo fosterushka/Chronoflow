@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
-import AddCardModal from "./AddCardModal.tsx";
-import EditCardModal from "./EditCardModal.tsx";
+import CardModal from "./CardModal.tsx";
 import DeleteCardModal from "./DeleteCardModal.tsx";
-import Sidebar from "./Sidebar.tsx";
+import HeaderControls from "./HeaderControls.tsx";
+import DarkModeToggle from "./DarkModeToggle.tsx";
 import CardPreview from "../components/CardPreview.tsx";
 import type {
   Card,
@@ -134,8 +134,7 @@ export default function Board() {
   });
 
   const [draggedCard, setDraggedCard] = useState<DraggedCard | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<EditingCard | null>(null);
   const [deletingCard, setDeletingCard] = useState<
@@ -349,62 +348,60 @@ export default function Board() {
 
   const openAddModal = useCallback((columnId: string) => {
     setActiveColumn(columnId);
-    setIsAddModalOpen(true);
-  }, []);
-
-  const handleAddCard = useCallback(
-    (cardData: Omit<Card, "id" | "timeSpent" | "isTracking">) => {
-      if (!activeColumn) return;
-
-      const newCard: Card = {
-        ...cardData,
-        id: crypto.randomUUID(),
-        timeSpent: 0,
-        isTracking: false,
-        lastTrackingStart: undefined,
-        currentElapsedTime: 0,
-      };
-
-      setColumns((prevColumns: Column[]) => {
-        return prevColumns.map((column: Column) => {
-          if (column.id === activeColumn) {
-            return {
-              ...column,
-              cards: [...column.cards, newCard],
-            };
-          }
-          return column;
-        });
-      });
-
-      setIsAddModalOpen(false);
-      setActiveColumn(null);
-    },
-    [activeColumn],
-  );
-
-  const handleEditCard = useCallback((updatedCard: Card) => {
-    if (!editingCard) return;
-
-    const updatedColumns = columns.map((column) => ({
-      ...column,
-      cards: column.cards.map((card) =>
-        card.id === updatedCard.id
-          ? { ...updatedCard, isTracking: card.isTracking }
-          : card
-      ),
-    }));
-
-    dispatchBoardUpdate(updatedColumns);
-    setColumns(updatedColumns);
-    setIsEditModalOpen(false);
     setEditingCard(null);
-  }, [columns, editingCard]);
+    setIsCardModalOpen(true);
+  }, []);
 
   const openEditModal = useCallback((card: Card, columnId: string) => {
     setEditingCard({ card, columnId });
-    setIsEditModalOpen(true);
+    setIsCardModalOpen(true);
   }, []);
+
+  const handleCardSubmit = useCallback(
+    (cardData: Card) => {
+      if (editingCard) {
+        // Handle edit case
+        const updatedColumns = columns.map((column) => ({
+          ...column,
+          cards: column.cards.map((card) =>
+            card.id === cardData.id
+              ? { ...cardData, isTracking: card.isTracking }
+              : card
+          ),
+        }));
+
+        dispatchBoardUpdate(updatedColumns);
+        setColumns(updatedColumns);
+      } else if (activeColumn) {
+        // Handle add case
+        const newCard: Card = {
+          ...cardData,
+          id: crypto.randomUUID(),
+          timeSpent: 0,
+          isTracking: false,
+          lastTrackingStart: undefined,
+          currentElapsedTime: 0,
+        };
+
+        setColumns((prevColumns: Column[]) => {
+          return prevColumns.map((column: Column) => {
+            if (column.id === activeColumn) {
+              return {
+                ...column,
+                cards: [...column.cards, newCard],
+              };
+            }
+            return column;
+          });
+        });
+      }
+
+      setIsCardModalOpen(false);
+      setEditingCard(null);
+      setActiveColumn(null);
+    },
+    [activeColumn, columns, editingCard],
+  );
 
   const getStatistics = useCallback(() => {
     const totalTasks = columns.reduce(
@@ -461,13 +458,31 @@ export default function Board() {
   };
 
   const getTimeBasedColor = (card: Card, columnId: string) => {
+    if (card.isTracking) {
+      const estimatedTimeInSeconds = card.estimatedTime
+        ? card.estimatedTime * 60
+        : 0;
+      const currentElapsedTime = Math.floor(
+        (Date.now() - (card.lastTrackingStart || 0)) / 1000,
+      );
+      const totalTime = card.timeSpent + currentElapsedTime;
+
+      if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
+        return "bg-red-100/90 dark:bg-red-900/90";
+      }
+      if (estimatedTimeInSeconds && totalTime >= estimatedTimeInSeconds / 2) {
+        return "bg-amber-100/90 dark:bg-amber-900/90";
+      }
+      return "bg-white dark:bg-gray-800/90";
+    }
+
     if (hasExceededEstimatedTime(card)) {
       return "bg-red-50/80 dark:bg-red-900/30 ring-2 ring-red-500/50";
     }
     if (isNearingEstimatedTime(card)) {
       return "bg-amber-50/80 dark:bg-amber-900/30 ring-1 ring-amber-500/50";
     }
-    return "bg-gray-50/80 dark:bg-gray-700/50";
+    return "bg-white dark:bg-gray-800/90";
   };
 
   const handleDeleteCard = (card: Card, columnId: string) => {
@@ -499,33 +514,81 @@ export default function Board() {
   const stats = getStatistics();
 
   return (
-    <div class="flex h-screen">
-      <Sidebar
-        stats={stats}
-        activeTask={columns.some((col) =>
-            col.cards.some((card) => card.isTracking)
-          )
-          ? {
-            title:
-              columns.find((col) => col.cards.some((card) => card.isTracking))
-                ?.cards.find((card) => card.isTracking)?.title || "",
-          }
-          : undefined}
-      />
+    <div class="h-screen flex flex-col">
+      <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-sm sticky top-0 z-50">
+        <div class="flex items-center justify-between px-4 h-14">
+          <div class="flex items-center gap-3">
+            <div class="w-6 h-6 flex-shrink-0 bg-indigo-500 rounded flex items-center justify-center">
+              <svg
+                class="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
+            <h1 class="font-semibold text-gray-700 dark:text-white text-sm">
+              Chronoflow
+            </h1>
+          </div>
 
-      <div class="flex-1 p-6 overflow-x-auto bg-gray-100/50 dark:bg-gray-900">
-        <div class="flex gap-6 h-full min-h-0">
-          {columns.map((column) => (
+          <div class="flex items-center gap-4">
+            {columns.some((col) => col.cards.some((card) => card.isTracking))
+              ? (
+                <div class="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse">
+                  </div>
+                  <div class="text-xs text-emerald-700 dark:text-emerald-300 font-medium max-w-[200px] truncate">
+                    {columns.find((col) =>
+                      col.cards.some((card) => card.isTracking)
+                    )?.cards.find((card) => card.isTracking)?.title || ""}
+                  </div>
+                </div>
+              )
+              : null}
+
+            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+              <div class="flex items-center gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                <span>{stats.totalTasks} tasks</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                <span>{stats.completedTasks} completed</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                <span>{Math.floor(stats.totalTimeSpent / 3600)}h spent</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <HeaderControls />
+              <DarkModeToggle />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 p-6 bg-gray-100/50 dark:bg-gray-900 min-h-0">
+        <div class="grid grid-cols-5 gap-4 h-full auto-rows-fr">
+          {columns.map((column, index) => (
             <div
               key={column.id}
-              class="w-[320px] flex-none flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm"
+              class="flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm min-w-0"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
             >
-              <div class="px-4 py-3 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
-                <div class="flex items-center gap-2">
+              <div class="shrink-0 px-4 py-3 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
+                <div class="flex items-center gap-2 min-w-0">
                   <div
-                    class={`w-2 h-2 rounded-full ${
+                    class={`shrink-0 w-2 h-2 rounded-full ${
                       column.id === "todo"
                         ? "bg-indigo-500"
                         : column.id === "inProgress"
@@ -538,17 +601,17 @@ export default function Board() {
                     }`}
                   >
                   </div>
-                  <h2 class="font-medium text-gray-700 dark:text-gray-200">
+                  <h2 class="font-medium text-gray-700 dark:text-gray-200 truncate">
                     {column.title}
                   </h2>
-                  <span class="text-sm text-gray-500 dark:text-gray-500">
+                  <span class="shrink-0 text-sm text-gray-500 dark:text-gray-500">
                     {column.cards.length}
                   </span>
                 </div>
                 {column.id !== "done" && (
                   <button
                     onClick={() => openAddModal(column.id)}
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                    class="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                   >
                     <svg
                       class="w-5 h-5"
@@ -568,16 +631,17 @@ export default function Board() {
                 )}
               </div>
 
-              <div class="overflow-y-auto flex-1">
-                <div class="px-3 py-2 space-y-2">
+              <div class="overflow-y-auto flex-1 min-h-0">
+                <div class="p-2 space-y-2">
                   {column.cards.map((card) => (
-                    <div key={card.id} class="w-[290px] mx-auto">
+                    <div key={card.id} class="mb-2">
                       <CardPreview
                         key={card.id}
                         card={card}
                         columnId={column.id}
                         isLabelsCollapsed={isLabelsCollapsed}
-                        onLabelClick={() => setIsLabelsCollapsed((prev) => !prev)}
+                        onLabelClick={() =>
+                          setIsLabelsCollapsed((prev) => !prev)}
                         onDragStart={() => handleDragStart(card, column.id)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => handleDragOver(e)}
@@ -603,28 +667,18 @@ export default function Board() {
         </div>
       </div>
 
-      <AddCardModal
-        isOpen={isAddModalOpen}
+      <CardModal
+        isOpen={isCardModalOpen}
         onClose={() => {
-          setIsAddModalOpen(false);
+          setIsCardModalOpen(false);
+          setEditingCard(null);
           setActiveColumn(null);
         }}
-        onSubmit={handleAddCard}
+        onSubmit={handleCardSubmit}
         labels={LABELS}
+        card={editingCard?.card || null}
+        mode={editingCard ? "edit" : "add"}
       />
-
-      {editingCard && (
-        <EditCardModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setEditingCard(null);
-          }}
-          onSubmit={handleEditCard}
-          card={editingCard.card}
-          labels={LABELS}
-        />
-      )}
 
       {deletingCard && (
         <DeleteCardModal
