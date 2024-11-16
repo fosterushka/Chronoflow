@@ -518,7 +518,7 @@ export default function Board() {
           {columns.map((column) => (
             <div
               key={column.id}
-              class="w-[320px] flex-none flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm"
+              class="w-[300px] flex-none flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
             >
