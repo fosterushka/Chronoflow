@@ -1,15 +1,24 @@
-import { useCallback, useState, useEffect } from "preact/hooks";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
 import AddCardModal from "./AddCardModal.tsx";
 import EditCardModal from "./EditCardModal.tsx";
 import DeleteCardModal from "./DeleteCardModal.tsx";
 import Sidebar from "./Sidebar.tsx";
-import type { Card, Column, Label, DraggedCard, EditingCard } from "../types/index.ts";
+import CardPreview from "../components/CardPreview.tsx";
+import type {
+  Card,
+  Column,
+  DraggedCard,
+  EditingCard,
+  Label,
+} from "../types/index.ts";
 
-const BOARD_UPDATE_EVENT = 'board-update';
+const BOARD_UPDATE_EVENT = "board-update";
 
 export const dispatchBoardUpdate = (columns: Column[]) => {
-  globalThis.dispatchEvent(new CustomEvent(BOARD_UPDATE_EVENT, { detail: { columns } }));
+  globalThis.dispatchEvent(
+    new CustomEvent(BOARD_UPDATE_EVENT, { detail: { columns } }),
+  );
 };
 
 export const LABELS: Label[] = [
@@ -21,7 +30,7 @@ export const LABELS: Label[] = [
   { id: "refactor", name: "Refactor", color: "bg-orange-500" },
 ];
 
-export const COLUMNS: Omit<Column, 'cards'>[] = [
+export const COLUMNS: Omit<Column, "cards">[] = [
   { id: "todo", title: "To Do" },
   { id: "inProgress", title: "In Progress" },
   { id: "codeReview", title: "Code Review" },
@@ -30,9 +39,11 @@ export const COLUMNS: Omit<Column, 'cards'>[] = [
 ];
 
 export function clearStorage(setColumns: (cols: Column[]) => void) {
-  if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-    const emptyColumns = COLUMNS.map(col => ({ ...col, cards: [] }));
-    localStorage.setItem('chronoflowColumns', JSON.stringify(emptyColumns));
+  if (
+    confirm("Are you sure you want to clear all data? This cannot be undone.")
+  ) {
+    const emptyColumns = COLUMNS.map((col) => ({ ...col, cards: [] }));
+    localStorage.setItem("chronoflowColumns", JSON.stringify(emptyColumns));
     setColumns(emptyColumns);
     dispatchBoardUpdate(emptyColumns);
   }
@@ -40,11 +51,11 @@ export function clearStorage(setColumns: (cols: Column[]) => void) {
 
 export function exportData(columns: Column[]) {
   const data = JSON.stringify(columns, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
+  const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
-  a.download = `chronoflow-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `chronoflow-${new Date().toISOString().split("T")[0]}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -53,7 +64,7 @@ export function exportData(columns: Column[]) {
 
 export function importData(
   file: File | undefined,
-  setColumns: (cols: Column[]) => void
+  setColumns: (cols: Column[]) => void,
 ) {
   if (!file) return;
 
@@ -62,32 +73,39 @@ export function importData(
     try {
       const content = e.target?.result as string;
       const data = JSON.parse(content);
-      
+
       // Validate the data structure
-      if (Array.isArray(data) && data.every(col => 
-        col.id && col.title && Array.isArray(col.cards) &&
-        col.cards.every((card: any) => card.id && card.title)
-      )) {
+      if (
+        Array.isArray(data) &&
+        data.every((col) =>
+          col.id && col.title && Array.isArray(col.cards) &&
+          col.cards.every((card: any) => card.id && card.title)
+        )
+      ) {
         // Initialize timeSpent and other missing properties
         const processedData = data.map((col: Column) => ({
           ...col,
-          cards: col.cards.map(card => ({
+          cards: col.cards.map((card) => ({
             ...card,
             timeSpent: card.timeSpent || 0,
             isTracking: false,
             lastTrackingStart: undefined,
+            currentElapsedTime: 0,
           })),
         }));
 
-        localStorage.setItem('chronoflowColumns', JSON.stringify(processedData));
+        localStorage.setItem(
+          "chronoflowColumns",
+          JSON.stringify(processedData),
+        );
         setColumns(processedData);
         dispatchBoardUpdate(processedData);
       } else {
-        alert('Invalid file format');
+        alert("Invalid file format");
       }
     } catch (error) {
-      alert('Error importing file');
-      console.error('Import error:', error);
+      alert("Error importing file");
+      console.error("Import error:", error);
     }
   };
   reader.readAsText(file);
@@ -95,23 +113,24 @@ export function importData(
 
 export default function Board() {
   const [columns, setColumns] = useState<Column[]>(() => {
-    if (typeof localStorage !== 'undefined') {
-      const savedData = localStorage.getItem('chronoflowColumns');
+    if (typeof localStorage !== "undefined") {
+      const savedData = localStorage.getItem("chronoflowColumns");
       if (savedData) {
         const parsedData = JSON.parse(savedData);
         return parsedData.map((col: Column) => ({
           ...col,
-          cards: col.cards.map(card => ({
+          cards: col.cards.map((card) => ({
             ...card,
             timeSpent: card.timeSpent || 0,
             isTracking: false,
             lastTrackingStart: undefined,
+            currentElapsedTime: 0,
           })),
         }));
       }
-      return COLUMNS.map(col => ({ ...col, cards: [] }));
+      return COLUMNS.map((col) => ({ ...col, cards: [] }));
     }
-    return COLUMNS.map(col => ({ ...col, cards: [] }));
+    return COLUMNS.map((col) => ({ ...col, cards: [] }));
   });
 
   const [draggedCard, setDraggedCard] = useState<DraggedCard | null>(null);
@@ -119,9 +138,12 @@ export default function Board() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<EditingCard | null>(null);
-  const [deletingCard, setDeletingCard] = useState<{ card: Card; columnId: string } | null>(null);
+  const [deletingCard, setDeletingCard] = useState<
+    { card: Card; columnId: string } | null
+  >(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [isLabelsCollapsed, setIsLabelsCollapsed] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -131,33 +153,34 @@ export default function Board() {
   }, []);
 
   useEffect(() => {
-    setColumns(prevColumns => {
+    setColumns((prevColumns) => {
       let hasUpdates = false;
-      const newColumns = prevColumns.map(column => ({
+      const newColumns = prevColumns.map((column) => ({
         ...column,
-        cards: column.cards.map(card => {
+        cards: column.cards.map((card) => {
           if (card.isTracking) {
             hasUpdates = true;
-            const elapsedTime = Math.floor((currentTime - (card.lastTrackingStart || 0)) / 1000);
+            // Don't add to timeSpent, just calculate current elapsed time
+            const elapsedTime = Math.floor(
+              (currentTime - (card.lastTrackingStart || 0)) / 1000,
+            );
             return {
               ...card,
-              timeSpent: (card.timeSpent || 0) + elapsedTime,
-              lastTrackingStart: currentTime,
+              // Keep original timeSpent and just update lastTrackingStart
+              lastTrackingStart: card.lastTrackingStart,
+              // Store current elapsed time separately for display
+              currentElapsedTime: elapsedTime,
             };
           }
-          return card;
+          return {
+            ...card,
+            currentElapsedTime: 0,
+          };
         }),
       }));
       return hasUpdates ? newColumns : prevColumns;
     });
   }, [currentTime]);
-
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('chronoflowColumns', JSON.stringify(columns));
-      dispatchBoardUpdate(columns);
-    }
-  }, [columns]);
 
   useEffect(() => {
     const handleBoardUpdate = (e: Event) => {
@@ -168,16 +191,59 @@ export default function Board() {
     };
 
     globalThis.addEventListener(BOARD_UPDATE_EVENT, handleBoardUpdate);
-    return () => globalThis.removeEventListener(BOARD_UPDATE_EVENT, handleBoardUpdate);
+    return () =>
+      globalThis.removeEventListener(BOARD_UPDATE_EVENT, handleBoardUpdate);
   }, []);
 
   const handleDragStart = useCallback((card: Card, columnId: string) => {
     setDraggedCard({ card, columnId });
   }, []);
 
-  const handleDragOver = useCallback((e: JSX.TargetedDragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDragEnd = useCallback(() => {
+    setDraggedCard(null);
   }, []);
+
+  const handleDragOver = useCallback(
+    (e: JSX.TargetedDragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const targetCard = e.currentTarget.dataset.card
+        ? JSON.parse(e.currentTarget.dataset.card)
+        : null;
+      const targetColumnId = e.currentTarget.dataset.columnId || "";
+
+      if (
+        !draggedCard || !targetCard || draggedCard.card.id === targetCard.id
+      ) return;
+
+      // Only reorder within the same column
+      if (draggedCard.columnId === targetColumnId) {
+        setColumns((prevColumns) => {
+          return prevColumns.map((column) => {
+            if (column.id === targetColumnId) {
+              const cards = [...column.cards];
+              const draggedIndex = cards.findIndex((card) =>
+                card.id === draggedCard.card.id
+              );
+              const targetIndex = cards.findIndex((card) =>
+                card.id === targetCard.id
+              );
+
+              // Remove dragged card and insert at new position
+              const [draggedCardItem] = cards.splice(draggedIndex, 1);
+              cards.splice(targetIndex, 0, draggedCardItem);
+
+              return {
+                ...column,
+                cards,
+              };
+            }
+            return column;
+          });
+        });
+      }
+    },
+    [draggedCard],
+  );
 
   const handleDrop = useCallback((targetColumnId: string) => {
     if (!draggedCard) return;
@@ -186,87 +252,98 @@ export default function Board() {
     if (sourceColumnId === targetColumnId) return;
 
     // When moving to Done column, stop tracking if active
-    if (targetColumnId === 'done' && card.isTracking) {
+    if (targetColumnId === "done" && card.isTracking) {
       card.isTracking = false;
       card.lastTrackingStart = undefined;
     }
 
-    setColumns(prevColumns => {
-      return prevColumns.map(column => {
+    setColumns((prevColumns) => {
+      return prevColumns.map((column) => {
         if (column.id === sourceColumnId) {
           return {
             ...column,
-            cards: column.cards.filter(c => c.id !== card.id)
+            cards: column.cards.filter((c) => c.id !== card.id),
           };
         }
         if (column.id === targetColumnId) {
           return {
             ...column,
-            cards: [...column.cards, card]
+            cards: [...column.cards, card],
           };
         }
         return column;
       });
     });
-    
+
     setDraggedCard(null);
   }, [draggedCard]);
 
-  const deleteCard = useCallback((columnId: string, cardId: string) => {
-    if (!confirm("Are you sure you want to delete this card?")) return;
-
-    setColumns(prevColumns => {
-      return prevColumns.map(column => {
-        if (column.id === columnId) {
-          return {
-            ...column,
-            cards: column.cards.filter(card => card.id !== cardId),
-          };
-        }
-        return column;
-      });
-    });
-  }, []);
-
   const toggleTracking = useCallback((columnId: string, cardId: string) => {
     // Don't allow tracking in Done column
-    if (columnId === 'done') return;
+    if (columnId === "done") return;
 
-    setColumns(prevColumns => {
+    setColumns((prevColumns) => {
       const targetCard = prevColumns
-        .find(col => col.id === columnId)
-        ?.cards.find(card => card.id === cardId);
+        .find((col) => col.id === columnId)
+        ?.cards.find((card) => card.id === cardId);
 
+      let newColumns;
       if (targetCard && !targetCard.isTracking) {
-        return prevColumns.map(column => ({
+        // Start tracking
+        newColumns = prevColumns.map((column) => ({
           ...column,
-          cards: column.cards.map(card => {
+          cards: column.cards.map((card) => {
             if (card.id === cardId && column.id === columnId) {
               return {
                 ...card,
                 isTracking: true,
                 lastTrackingStart: Date.now(),
+                currentElapsedTime: 0,
               };
             } else if (card.isTracking) {
+              // Stop tracking any other card that was being tracked
+              const elapsedTime = Math.floor(
+                (Date.now() - (card.lastTrackingStart || 0)) / 1000,
+              );
               return {
                 ...card,
                 isTracking: false,
                 lastTrackingStart: undefined,
+                currentElapsedTime: 0,
+                timeSpent: (card.timeSpent || 0) + elapsedTime,
               };
             }
             return card;
           }),
         }));
       } else {
-        return prevColumns.map(column => ({
+        // Stop tracking - save to localStorage
+        newColumns = prevColumns.map((column) => ({
           ...column,
-          cards: column.cards.map(card => 
-            card.id === cardId && column.id === columnId
-              ? { ...card, isTracking: false, lastTrackingStart: undefined }
-              : card
-          ),
+          cards: column.cards.map((card) => {
+            if (card.id === cardId && column.id === columnId) {
+              const elapsedTime = Math.floor(
+                (Date.now() - (card.lastTrackingStart || 0)) / 1000,
+              );
+              const updatedCard = {
+                ...card,
+                isTracking: false,
+                lastTrackingStart: undefined,
+                currentElapsedTime: 0,
+                timeSpent: (card.timeSpent || 0) + elapsedTime,
+              };
+              return updatedCard;
+            }
+            return card;
+          }),
         }));
+        // Save to localStorage only when stopping the timer
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+          dispatchBoardUpdate(newColumns);
+        }
       }
+      return newColumns;
     });
   }, []);
 
@@ -275,52 +352,54 @@ export default function Board() {
     setIsAddModalOpen(true);
   }, []);
 
-  const handleAddCard = useCallback((cardData: Omit<Card, "id" | "timeSpent" | "isTracking">) => {
-    if (!activeColumn) return;
+  const handleAddCard = useCallback(
+    (cardData: Omit<Card, "id" | "timeSpent" | "isTracking">) => {
+      if (!activeColumn) return;
 
-    const newCard: Card = {
-      ...cardData,
-      id: crypto.randomUUID(),
-      timeSpent: 0,
-      isTracking: false,
-    };
+      const newCard: Card = {
+        ...cardData,
+        id: crypto.randomUUID(),
+        timeSpent: 0,
+        isTracking: false,
+        lastTrackingStart: undefined,
+        currentElapsedTime: 0,
+      };
 
-    setColumns((prevColumns: any[]) => {
-      return prevColumns.map((column: { id: any; cards: any; }) => {
-        if (column.id === activeColumn) {
-          return {
-            ...column,
-            cards: [...column.cards, newCard],
-          };
-        }
-        return column;
+      setColumns((prevColumns: Column[]) => {
+        return prevColumns.map((column: Column) => {
+          if (column.id === activeColumn) {
+            return {
+              ...column,
+              cards: [...column.cards, newCard],
+            };
+          }
+          return column;
+        });
       });
-    });
 
-    setIsAddModalOpen(false);
-    setActiveColumn(null);
-  }, [activeColumn]);
+      setIsAddModalOpen(false);
+      setActiveColumn(null);
+    },
+    [activeColumn],
+  );
 
   const handleEditCard = useCallback((updatedCard: Card) => {
     if (!editingCard) return;
 
-    setColumns((prevColumns: any[]) => {
-      return prevColumns.map((column: { id: any; cards: any[]; }) => {
-        if (column.id === editingCard.columnId) {
-          return {
-            ...column,
-            cards: column.cards.map((card: { id: string; }) => 
-              card.id === updatedCard.id ? updatedCard : card
-            ),
-          };
-        }
-        return column;
-      });
-    });
+    const updatedColumns = columns.map((column) => ({
+      ...column,
+      cards: column.cards.map((card) =>
+        card.id === updatedCard.id
+          ? { ...updatedCard, isTracking: card.isTracking }
+          : card
+      ),
+    }));
 
+    dispatchBoardUpdate(updatedColumns);
+    setColumns(updatedColumns);
     setIsEditModalOpen(false);
     setEditingCard(null);
-  }, [editingCard]);
+  }, [columns, editingCard]);
 
   const openEditModal = useCallback((card: Card, columnId: string) => {
     setEditingCard({ card, columnId });
@@ -328,20 +407,35 @@ export default function Board() {
   }, []);
 
   const getStatistics = useCallback(() => {
-    const totalTasks = columns.reduce((acc: any, col: { cards: string | any[]; }) => acc + col.cards.length, 0);
-    const completedTasks = columns.find((col: { id: string; }) => col.id === "done")?.cards.length || 0;
-    const totalEstimatedTime = columns.reduce((acc: any, col: { cards: any[]; }) => 
-      acc + col.cards.reduce((sum: any, card: { estimatedTime: any; }) => sum + (card.estimatedTime || 0), 0), 0
+    const totalTasks = columns.reduce(
+      (acc: any, col: { cards: string | any[] }) => acc + col.cards.length,
+      0,
     );
-    const totalTimeSpent = columns.reduce((acc: any, col: { cards: any[]; }) => 
-      acc + col.cards.reduce((sum: any, card: { timeSpent: any; }) => sum + (card.timeSpent || 0), 0), 0
+    const completedTasks = columns.find((col: { id: string }) =>
+      col.id === "done"
+    )?.cards.length || 0;
+    const totalEstimatedTime = columns.reduce(
+      (acc: any, col: { cards: any[] }) =>
+        acc +
+        col.cards.reduce((sum: any, card: { estimatedTime: any }) =>
+          sum + (card.estimatedTime || 0), 0),
+      0,
     );
-    
-    return { 
-      totalTasks, 
-      completedTasks, 
+    const totalTimeSpent = columns.reduce(
+      (acc: any, col: { cards: any[] }) =>
+        acc +
+        col.cards.reduce(
+          (sum: any, card: { timeSpent: any }) => sum + (card.timeSpent || 0),
+          0,
+        ),
+      0,
+    );
+
+    return {
+      totalTasks,
+      completedTasks,
       totalEstimatedTime: totalEstimatedTime || 0,
-      totalTimeSpent: totalTimeSpent || 0
+      totalTimeSpent: totalTimeSpent || 0,
     };
   }, [columns]);
 
@@ -362,17 +456,18 @@ export default function Board() {
     if (!card.estimatedTime) return false;
     const estimatedTimeInSeconds = card.estimatedTime * 60;
     const halfTime = estimatedTimeInSeconds / 2;
-    return card.timeSpent >= halfTime && card.timeSpent <= estimatedTimeInSeconds;
+    return card.timeSpent >= halfTime &&
+      card.timeSpent <= estimatedTimeInSeconds;
   };
 
   const getTimeBasedColor = (card: Card, columnId: string) => {
     if (hasExceededEstimatedTime(card)) {
-      return 'bg-red-50/80 dark:bg-red-900/30 ring-2 ring-red-500/50';
+      return "bg-red-50/80 dark:bg-red-900/30 ring-2 ring-red-500/50";
     }
     if (isNearingEstimatedTime(card)) {
-      return 'bg-amber-50/80 dark:bg-amber-900/30 ring-1 ring-amber-500/50';
+      return "bg-amber-50/80 dark:bg-amber-900/30 ring-1 ring-amber-500/50";
     }
-    return 'bg-gray-50/80 dark:bg-gray-700/50';
+    return "bg-gray-50/80 dark:bg-gray-700/50";
   };
 
   const handleDeleteCard = (card: Card, columnId: string) => {
@@ -383,12 +478,14 @@ export default function Board() {
   const confirmDeleteCard = () => {
     if (!deletingCard) return;
 
-    setColumns(prevColumns => {
-      return prevColumns.map(column => {
+    setColumns((prevColumns) => {
+      return prevColumns.map((column) => {
         if (column.id === deletingCard.columnId) {
           return {
             ...column,
-            cards: column.cards.filter(card => card.id !== deletingCard.card.id),
+            cards: column.cards.filter((card) =>
+              card.id !== deletingCard.card.id
+            ),
           };
         }
         return column;
@@ -403,39 +500,44 @@ export default function Board() {
 
   return (
     <div class="flex h-screen">
-      <Sidebar 
+      <Sidebar
         stats={stats}
-        activeTask={
-          columns.some(col => col.cards.some(card => card.isTracking))
-            ? {
-                title: columns.find(col => 
-                  col.cards.some(card => card.isTracking)
-                )?.cards.find(card => 
-                  card.isTracking
-                )?.title || ""
-              }
-            : undefined
-        }
+        activeTask={columns.some((col) =>
+            col.cards.some((card) => card.isTracking)
+          )
+          ? {
+            title:
+              columns.find((col) => col.cards.some((card) => card.isTracking))
+                ?.cards.find((card) => card.isTracking)?.title || "",
+          }
+          : undefined}
       />
-      
-      <div class="flex-1 p-6 overflow-hidden bg-gray-100/50 dark:bg-gray-900">
+
+      <div class="flex-1 p-6 overflow-x-auto bg-gray-100/50 dark:bg-gray-900">
         <div class="flex gap-6 h-full min-h-0">
-          {columns.map(column => (
+          {columns.map((column) => (
             <div
               key={column.id}
-              class="flex-1 flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm min-w-[280px]"
+              class="w-[320px] flex-none flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
             >
-              <div class="p-4 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
+              <div class="px-4 py-3 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
                 <div class="flex items-center gap-2">
-                  <div class={`w-2 h-2 rounded-full ${
-                    column.id === 'todo' ? 'bg-indigo-500' :
-                    column.id === 'inProgress' ? 'bg-amber-500' :
-                    column.id === 'codeReview' ? 'bg-purple-500' :
-                    column.id === 'testing' ? 'bg-blue-500' :
-                    'bg-emerald-500'
-                  }`}></div>
+                  <div
+                    class={`w-2 h-2 rounded-full ${
+                      column.id === "todo"
+                        ? "bg-indigo-500"
+                        : column.id === "inProgress"
+                        ? "bg-amber-500"
+                        : column.id === "codeReview"
+                        ? "bg-purple-500"
+                        : column.id === "testing"
+                        ? "bg-blue-500"
+                        : "bg-emerald-500"
+                    }`}
+                  >
+                  </div>
                   <h2 class="font-medium text-gray-700 dark:text-gray-200">
                     {column.title}
                   </h2>
@@ -443,113 +545,58 @@ export default function Board() {
                     {column.cards.length}
                   </span>
                 </div>
-                {column.id !== 'done' && (
+                {column.id !== "done" && (
                   <button
                     onClick={() => openAddModal(column.id)}
                     class="text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      >
+                      </path>
                     </svg>
                   </button>
                 )}
               </div>
-              
-              <div class="overflow-y-auto flex-1 p-4 space-y-3">
-                {column.cards.map(card => (
-                  <div
-                    key={card.id}
-                    class={`group relative rounded-lg shadow-sm hover:shadow-md transition-all duration-500 cursor-move
-                      ${getTimeBasedColor(card, column.id)}
-                      ${card.isTracking ? 'ring-2 ring-emerald-500/20' : ''}`}
-                    draggable
-                    onDragStart={() => handleDragStart(card, column.id)}
-                    onClick={() => openEditModal(card, column.id)}
-                  >
-                    <div class="p-3">
-                      <div class="flex flex-wrap gap-1.5 mb-2">
-                        {card.labels.map(labelId => {
-                          const label = LABELS.find(l => l.id === labelId);
-                          return label ? (
-                            <span key={label.id} class={`${label.color} bg-opacity-10 dark:bg-opacity-20 text-xs px-2 py-0.5 rounded-full`}>
-                              {label.name}
-                            </span>
-                          ) : null;
-                        })}
-                      </div>
 
-                      <h3 class="font-medium text-gray-900 dark:text-gray-100 mb-1">
-                        {card.title}
-                      </h3>
-                      
-                      {card.description && (
-                        <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">
-                          {card.description}
-                        </p>
-                      )}
-
-                      <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <div class="space-x-3">
-                          {card.dueDate && (
-                            <span class="inline-flex items-center gap-1">
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              {card.dueDate}
-                            </span>
-                          )}
-                          {card.estimatedTime && (
-                            <span class={`inline-flex items-center gap-1 ${hasExceededEstimatedTime(card) ? 'text-red-500 dark:text-red-400' : ''}`}>
-                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              {Math.floor(card.estimatedTime / 60)}h {card.estimatedTime % 60}m
-                            </span>
-                          )}
-                        </div>
-
-                        {column.id !== 'done' && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleTracking(column.id, card.id);
-                            }}
-                            class={`opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-1 rounded text-xs font-medium ${
-                              card.isTracking
-                                ? "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                : "text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
-                            }`}
-                          >
-                            {card.isTracking ? "Stop" : "Start"}
-                          </button>
-                        )}
-                      </div>
-
-                      <div class="mt-2 text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                        {card.estimatedTime && (
-                          <div>
-                            Est: {Math.floor(card.estimatedTime / 60)}h {card.estimatedTime % 60}m
-                          </div>
-                        )}
-                        <div>
-                          Time spent: {formatTime(card.timeSpent)}
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={(e) => {
+              <div class="overflow-y-auto flex-1">
+                <div class="px-3 py-2 space-y-2">
+                  {column.cards.map((card) => (
+                    <div key={card.id} class="w-[290px] mx-auto">
+                      <CardPreview
+                        key={card.id}
+                        card={card}
+                        columnId={column.id}
+                        isLabelsCollapsed={isLabelsCollapsed}
+                        onLabelClick={() => setIsLabelsCollapsed((prev) => !prev)}
+                        onDragStart={() => handleDragStart(card, column.id)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => handleDragOver(e)}
+                        onClick={() => openEditModal(card, column.id)}
+                        onTrackingToggle={(e) => {
+                          e.stopPropagation();
+                          toggleTracking(column.id, card.id);
+                        }}
+                        onDelete={(e) => {
                           e.stopPropagation();
                           handleDeleteCard(card, column.id);
                         }}
-                        class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                        getTimeBasedColor={getTimeBasedColor}
+                        formatTime={formatTime}
+                        hasExceededEstimatedTime={hasExceededEstimatedTime}
+                      />
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           ))}

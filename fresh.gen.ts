@@ -7,6 +7,7 @@ import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $AddCardModal from "./islands/AddCardModal.tsx";
 import * as $Board from "./islands/Board.tsx";
+import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
 import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
 import * as $EditCardModal from "./islands/EditCardModal.tsx";
@@ -24,6 +25,7 @@ const manifest = {
   islands: {
     "./islands/AddCardModal.tsx": $AddCardModal,
     "./islands/Board.tsx": $Board,
+    "./islands/ChangelogModal.tsx": $ChangelogModal,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
     "./islands/DeleteCardModal.tsx": $DeleteCardModal,
     "./islands/EditCardModal.tsx": $EditCardModal,

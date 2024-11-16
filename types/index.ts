@@ -4,6 +4,12 @@ export interface Label {
   color: string;
 }
 
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  isChecked: boolean;
+}
+
 export interface Card {
   id: string;
   title: string;
@@ -14,6 +20,8 @@ export interface Card {
   timeSpent: number;
   isTracking: boolean;
   lastTrackingStart?: number;
+  currentElapsedTime?: number;
+  checklist: ChecklistItem[];
 }
 
 export interface Column {

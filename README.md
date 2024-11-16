@@ -1,20 +1,25 @@
 # Chronoflow
 
-A modern task management application designed for development teams, featuring advanced time tracking and workflow optimization.
+A modern task management application designed for development teams, featuring
+advanced time tracking and workflow optimization.
 
-Actually i build this app for my own personal use, but i hope it can be useful for you too.
-Cuz trello alike is not enough for me.
-I am planning to monetize this app. But it will always have free tier. If you like this app, please consider supporting me.
+Actually i build this app for my own personal use, but i hope it can be useful
+for you too. Cuz trello alike is not enough for me. I am planning to monetize
+this app. But it will always have free tier. If you like this app, please
+consider supporting me.
 
 ## 🎯 Features
 
 ### Board Management
-- ✨ Five-stage workflow columns: Todo → In Progress → Code Review → Testing → Done
+
+- ✨ Five-stage workflow columns: Todo → In Progress → Code Review → Testing →
+  Done
 - 🔄 Drag-and-drop task movement between columns
 - 📊 Real-time task count per column
 - 🎯 Column-specific restrictions (e.g., no tracking in Done column)
 
 ### Task Management
+
 - ➕ Create tasks with title, description, and labels
 - 📝 Edit existing tasks
 - 🗑️ Delete tasks with confirmation modal
@@ -27,6 +32,7 @@ I am planning to monetize this app. But it will always have free tier. If you li
   - Refactor
 
 ### ⏱️ Advanced Time Tracking
+
 - 🔄 Track one task at a time
 - ⚡ Real-time time tracking
 - 🎯 Set estimated completion time
@@ -37,6 +43,7 @@ I am planning to monetize this app. But it will always have free tier. If you li
   - 💫 Clear visual feedback
 
 ### 💾 Data Management
+
 - 💾 Automatic saving to localStorage
 - 📤 Export board data to JSON
 - 📥 Import board from JSON
@@ -44,6 +51,7 @@ I am planning to monetize this app. But it will always have free tier. If you li
 - 🧹 Clear all data option
 
 ### 🎨 User Interface
+
 - 🌓 Dark/Light mode support with system detection
 - 📱 Responsive design
 - 🎯 Minimalistic and clean interface
@@ -56,6 +64,7 @@ I am planning to monetize this app. But it will always have free tier. If you li
 - 🔄 Smooth transitions
 
 ### 📊 Statistics
+
 - 📈 Total tasks counter
 - ✅ Completed tasks tracker
 - ⏱️ Total estimated time
@@ -84,7 +93,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Release Notes
 
+### v0.0.2
+
+- 🎨 Improved UI layout and consistency
+- 🔢 Added version display with changelog popup
+
 ### v0.0.1
+
 - Initial release of Chronoflow
 - Advanced time tracking with visual indicators
 - Five-stage workflow management
@@ -94,4 +109,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Eye-friendly design
 
 ---
+
 Built with ❤️ using Deno Fresh and Preact by Fosterushka
