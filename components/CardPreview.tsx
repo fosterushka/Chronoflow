@@ -206,9 +206,9 @@ export default function CardPreview({
             {/* Time Tracking */}
             <div class="flex items-center gap-2">
               <span>
-                {formatTime(card.timeSpent + card.currentElapsedTime)}
+                {formatTime(card.timeSpent + (card.currentElapsedTime || 0))}
               </span>
-              {columnId !== "done" && (
+              {columnId !== "todo" && columnId !== "done" && (
                 <button
                   onClick={onTrackingToggle}
                   class={`opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-1 rounded text-xs font-medium ${

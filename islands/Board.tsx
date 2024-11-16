@@ -13,6 +13,8 @@ import type {
   Label,
 } from "../types/index.ts";
 
+//TODO: move to utils or configs
+
 const BOARD_UPDATE_EVENT = "board-update";
 
 export const dispatchBoardUpdate = (columns: Column[]) => {
@@ -38,6 +40,7 @@ export const COLUMNS: Omit<Column, "cards">[] = [
   { id: "done", title: "Done" },
 ];
 
+//TODO: all functios to store or services.
 export function clearStorage(setColumns: (cols: Column[]) => void) {
   if (
     confirm("Are you sure you want to clear all data? This cannot be undone.")
@@ -250,14 +253,22 @@ export default function Board() {
     const { card, columnId: sourceColumnId } = draggedCard;
     if (sourceColumnId === targetColumnId) return;
 
-    // When moving to Done column, stop tracking if active
-    if (targetColumnId === "done" && card.isTracking) {
+    // Stop tracking when moving to todo or done
+    if (
+      (targetColumnId === "todo" || targetColumnId === "done") &&
+      card.isTracking
+    ) {
+      const elapsedTime = Math.floor(
+        (Date.now() - (card.lastTrackingStart || 0)) / 1000,
+      );
       card.isTracking = false;
       card.lastTrackingStart = undefined;
+      card.currentElapsedTime = 0;
+      card.timeSpent = (card.timeSpent || 0) + elapsedTime;
     }
 
     setColumns((prevColumns) => {
-      return prevColumns.map((column) => {
+      const newColumns = prevColumns.map((column) => {
         if (column.id === sourceColumnId) {
           return {
             ...column,
@@ -272,14 +283,18 @@ export default function Board() {
         }
         return column;
       });
+
+      // Save to localStorage
+      localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+      return newColumns;
     });
 
     setDraggedCard(null);
   }, [draggedCard]);
 
   const toggleTracking = useCallback((columnId: string, cardId: string) => {
-    // Don't allow tracking in Done column
-    if (columnId === "done") return;
+    // Don't allow tracking in todo or done columns
+    if (columnId === "todo" || columnId === "done") return;
 
     setColumns((prevColumns) => {
       const targetCard = prevColumns
@@ -315,8 +330,11 @@ export default function Board() {
             return card;
           }),
         }));
+        // Save to localStorage and dispatch update when starting tracking
+        localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+        dispatchBoardUpdate(newColumns);
       } else {
-        // Stop tracking - save to localStorage
+        // Stop tracking
         newColumns = prevColumns.map((column) => ({
           ...column,
           cards: column.cards.map((card) => {
@@ -324,23 +342,20 @@ export default function Board() {
               const elapsedTime = Math.floor(
                 (Date.now() - (card.lastTrackingStart || 0)) / 1000,
               );
-              const updatedCard = {
+              return {
                 ...card,
                 isTracking: false,
                 lastTrackingStart: undefined,
                 currentElapsedTime: 0,
                 timeSpent: (card.timeSpent || 0) + elapsedTime,
               };
-              return updatedCard;
             }
             return card;
           }),
         }));
-        // Save to localStorage only when stopping the timer
-        if (typeof localStorage !== "undefined") {
-          localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
-          dispatchBoardUpdate(newColumns);
-        }
+        // Save to localStorage and dispatch update when stopping tracking
+        localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+        dispatchBoardUpdate(newColumns);
       }
       return newColumns;
     });
@@ -403,6 +418,7 @@ export default function Board() {
     [activeColumn, columns, editingCard],
   );
 
+  //TODO: typesing everything and move into interfaces.
   const getStatistics = useCallback(() => {
     const totalTasks = columns.reduce(
       (acc: any, col: { cards: string | any[] }) => acc + col.cards.length,
@@ -539,20 +555,6 @@ export default function Board() {
           </div>
 
           <div class="flex items-center gap-4">
-            {columns.some((col) => col.cards.some((card) => card.isTracking))
-              ? (
-                <div class="bg-emerald-50 dark:bg-emerald-900/30 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse">
-                  </div>
-                  <div class="text-xs text-emerald-700 dark:text-emerald-300 font-medium max-w-[200px] truncate">
-                    {columns.find((col) =>
-                      col.cards.some((card) => card.isTracking)
-                    )?.cards.find((card) => card.isTracking)?.title || ""}
-                  </div>
-                </div>
-              )
-              : null}
-
             <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
               <div class="flex items-center gap-1.5">
                 <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
@@ -608,26 +610,29 @@ export default function Board() {
                     {column.cards.length}
                   </span>
                 </div>
+                {/* //TODO: move to const types */}
                 {column.id !== "done" && (
-                  <button
-                    onClick={() => openAddModal(column.id)}
-                    class="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <div class="flex gap-2">
+                    <button
+                      onClick={() => openAddModal(column.id)}
+                      class="w-full px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v16m8-8H4"
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                      </path>
-                    </svg>
-                  </button>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      Add Task
+                    </button>
+                  </div>
                 )}
               </div>
 

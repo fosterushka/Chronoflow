@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
 import { clearStorage, exportData, importData } from "./Board.tsx";
-import type { Column } from "../types/index.ts";
+import type { Card, Column } from "../types/index.ts";
 import ChangelogModal from "./ChangelogModal.tsx";
 
 export default function HeaderControls() {
@@ -14,6 +14,57 @@ export default function HeaderControls() {
   });
 
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  //TODO: could be done better
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${
+      minutes.toString().padStart(2, "0")
+    }:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Get currently tracked task
+  //TODO: bug if you move to done or todo still tracking time
+  const getTrackedTask = () => {
+    for (const column of columns) {
+      const trackedCard = column.cards.find((card) => card.isTracking);
+      if (trackedCard) {
+        return { card: trackedCard, columnId: column.id };
+      }
+    }
+    return null;
+  };
+
+  const getTimeBasedColor = (card: Card) => {
+    if (!card.isTracking) return "text-gray-500 dark:text-gray-400";
+
+    const estimatedTimeInSeconds = card.estimatedTime
+      ? card.estimatedTime * 60
+      : 0;
+    const currentElapsedTime = Math.floor(
+      (currentTime - (card.lastTrackingStart || 0)) / 1000,
+    );
+    const totalTime = (card.timeSpent || 0) + currentElapsedTime;
+
+    if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
+      return "text-red-500 dark:text-red-400";
+    }
+    if (estimatedTimeInSeconds && totalTime >= estimatedTimeInSeconds / 2) {
+      return "text-amber-500 dark:text-amber-400";
+    }
+    return "text-emerald-500 dark:text-emerald-400";
+  };
+
+  //TODO: bottleneck: Update timer every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Listen for board updates
   useEffect(() => {
@@ -37,15 +88,44 @@ export default function HeaderControls() {
     exportData(columns);
   };
 
+  //TODO: improved
   const handleImport = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
     const input = e.target as HTMLInputElement;
     importData(input.files?.[0], setColumns);
-    // Reset input value to allow importing the same file again
     input.value = "";
   };
 
+  const trackedTask = getTrackedTask();
+
   return (
     <div class="flex items-center gap-2">
+      {trackedTask && (
+        <>
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse">
+              </div>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
+                {trackedTask.card.title}
+              </span>
+            </div>
+            <span
+              class={`text-sm font-medium ${
+                getTimeBasedColor(trackedTask.card)
+              }`}
+            >
+              {formatTime(
+                (trackedTask.card.timeSpent || 0) +
+                  Math.floor(
+                    (currentTime - (trackedTask.card.lastTrackingStart || 0)) /
+                      1000,
+                  ),
+              )}
+            </span>
+          </div>
+          <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+        </>
+      )}
       <div class="relative group">
         <button
           onClick={handleClearStorage}

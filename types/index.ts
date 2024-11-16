@@ -22,6 +22,8 @@ export interface Card {
   lastTrackingStart?: number;
   currentElapsedTime?: number;
   checklist: ChecklistItem[];
+  githubRepo?: string;
+  githubAssignee?: string;
 }
 
 export interface Column {
