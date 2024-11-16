@@ -7,8 +7,19 @@ interface ChangelogModalProps {
 
 const changelog = [
   {
+    version: "0.0.3",
+    date: "16/11/2024",
+    changes: [
+      "Converted sidebar to sticky header for better space utilization",
+      "Enhanced time tracking visualization with dynamic indicators and colors",
+      "Made modal layout more compact and responsive",
+      "Fixed modal state persistence issues",
+      "Improved time input fields with better validation",
+    ],
+  },
+  {
     version: "0.0.2",
-    date: "2024",
+    date: "16/11/2024",
     changes: [
       "Improved UI layout and consistency",
       "Standardized column and card sizes",
@@ -21,7 +32,7 @@ const changelog = [
   },
   {
     version: "0.0.1",
-    date: "2024",
+    date: "15/11/2024",
     changes: [
       "Initial release",
       "Basic kanban board functionality",

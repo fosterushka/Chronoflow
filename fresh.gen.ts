@@ -11,7 +11,6 @@ import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
 import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
-import * as $Sidebar from "./islands/Sidebar.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -28,7 +27,6 @@ const manifest = {
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
     "./islands/DeleteCardModal.tsx": $DeleteCardModal,
     "./islands/HeaderControls.tsx": $HeaderControls,
-    "./islands/Sidebar.tsx": $Sidebar,
     "./islands/Statistics.tsx": $Statistics,
   },
   baseUrl: import.meta.url,

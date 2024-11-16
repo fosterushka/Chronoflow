@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
 import { clearStorage, exportData, importData } from "./Board.tsx";
 import type { Column } from "../types/index.ts";
+import ChangelogModal from "./ChangelogModal.tsx";
 
 export default function HeaderControls() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -11,6 +12,8 @@ export default function HeaderControls() {
     }
     return [];
   });
+
+  const [isChangelogOpen, setIsChangelogOpen] = useState(false);
 
   // Listen for board updates
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function HeaderControls() {
   };
 
   return (
-    <div class="flex gap-2">
+    <div class="flex items-center gap-2">
       <div class="relative group">
         <button
           onClick={handleClearStorage}
@@ -62,7 +65,7 @@ export default function HeaderControls() {
             />
           </svg>
         </button>
-        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
+        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           Clear All Data
         </span>
       </div>
@@ -82,11 +85,11 @@ export default function HeaderControls() {
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
             />
           </svg>
         </button>
-        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
+        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           Export Board
         </span>
       </div>
@@ -103,20 +106,39 @@ export default function HeaderControls() {
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
             />
           </svg>
           <input
             type="file"
             accept=".json"
-            class="hidden"
             onChange={handleImport}
+            class="hidden"
           />
         </label>
-        <span class="absolute mr-10 px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
+        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           Import Board
         </span>
       </div>
+
+      <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+      <div class="relative group">
+        <button
+          onClick={() => setIsChangelogOpen(true)}
+          class="flex items-center justify-center p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 rounded-lg transition-colors"
+        >
+          <span class="text-xs">0.0.3</span>
+        </button>
+        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
+          View Changelog
+        </span>
+      </div>
+
+      <ChangelogModal
+        isOpen={isChangelogOpen}
+        onClose={() => setIsChangelogOpen(false)}
+      />
     </div>
   );
 }
