@@ -5,12 +5,11 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $AddCardModal from "./islands/AddCardModal.tsx";
 import * as $Board from "./islands/Board.tsx";
+import * as $CardModal from "./islands/CardModal.tsx";
 import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
 import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
-import * as $EditCardModal from "./islands/EditCardModal.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $Sidebar from "./islands/Sidebar.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
@@ -23,12 +22,11 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
-    "./islands/AddCardModal.tsx": $AddCardModal,
     "./islands/Board.tsx": $Board,
+    "./islands/CardModal.tsx": $CardModal,
     "./islands/ChangelogModal.tsx": $ChangelogModal,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
     "./islands/DeleteCardModal.tsx": $DeleteCardModal,
-    "./islands/EditCardModal.tsx": $EditCardModal,
     "./islands/HeaderControls.tsx": $HeaderControls,
     "./islands/Sidebar.tsx": $Sidebar,
     "./islands/Statistics.tsx": $Statistics,

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
-import AddCardModal from "./AddCardModal.tsx";
-import EditCardModal from "./EditCardModal.tsx";
+import CardModal from "./CardModal.tsx";
 import DeleteCardModal from "./DeleteCardModal.tsx";
 import Sidebar from "./Sidebar.tsx";
 import CardPreview from "../components/CardPreview.tsx";
@@ -602,6 +601,7 @@ export default function Board() {
           ))}
         </div>
       </div>
+
 
       <AddCardModal
         isOpen={isAddModalOpen}

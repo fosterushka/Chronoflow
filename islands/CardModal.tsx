@@ -1,19 +1,10 @@
-import { useState } from "preact/hooks";
 import { JSX } from "preact";
-import type { Label } from "../types/index.ts";
+import { useEffect, useState } from "preact/hooks";
 
-interface AddCardModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (card: {
-    title: string;
-    description: string;
-    labels: string[];
-    dueDate?: string;
-    estimatedTime?: number;
-    checklist: ChecklistItem[];
-  }) => void;
-  labels: Label[];
+interface Label {
+  id: string;
+  name: string;
+  color: string;
 }
 
 interface ChecklistItem {
@@ -22,8 +13,28 @@ interface ChecklistItem {
   isChecked: boolean;
 }
 
-export default function AddCardModal(
-  { isOpen, onClose, onSubmit, labels }: AddCardModalProps,
+interface Card {
+  id?: string;
+  title: string;
+  description: string;
+  labels: string[];
+  dueDate?: string;
+  estimatedTime?: number;
+  timeSpent?: number;
+  checklist: ChecklistItem[];
+}
+
+interface CardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (card: Card) => void;
+  labels: Label[];
+  card?: Card | null;
+  mode: 'add' | 'edit';
+}
+
+export default function CardModal(
+  { isOpen, onClose, onSubmit, labels, card, mode }: CardModalProps,
 ) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -34,32 +45,52 @@ export default function AddCardModal(
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
 
-  const handleSubmit = (e: JSX.TargetedEvent<HTMLFormElement, Event>) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (mode === 'edit' && card) {
+      setTitle(card.title);
+      setDescription(card.description);
+      setSelectedLabels(card.labels);
+      setDueDate(card.dueDate || "");
+      if (card.estimatedTime) {
+        setEstimatedHours(Math.floor(card.estimatedTime / 60).toString());
+        setEstimatedMinutes((card.estimatedTime % 60).toString());
+      }
+      setChecklist(card.checklist || []);
+    }
+  }, [card, mode]);
 
+  const handleSubmit = (e: JSX.TargetedEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const estimatedTime = estimatedHours || estimatedMinutes
       ? (parseInt(estimatedHours || "0") * 60) +
         parseInt(estimatedMinutes || "0")
       : undefined;
 
-    onSubmit({
+    const newCard: Card = {
+      ...(mode === 'edit' && card ? card : {}),
       title,
       description,
       labels: selectedLabels,
       dueDate: dueDate || undefined,
       estimatedTime,
       checklist,
-    });
+    };
+
+    onSubmit(newCard);
+
+    if (mode === 'add') {
+      // Reset form only for add mode
+      setTitle("");
+      setDescription("");
+      setSelectedLabels([]);
+      setDueDate("");
+      setEstimatedHours("");
+      setEstimatedMinutes("");
+      setChecklist([]);
+      setNewChecklistItem("");
+    }
 
     onClose();
-    setTitle("");
-    setDescription("");
-    setSelectedLabels([]);
-    setDueDate("");
-    setEstimatedHours("");
-    setEstimatedMinutes("");
-    setChecklist([]);
-    setNewChecklistItem("");
   };
 
   const toggleLabel = (labelId: string) => {
@@ -68,6 +99,34 @@ export default function AddCardModal(
         ? prev.filter((id) => id !== labelId)
         : [...prev, labelId]
     );
+  };
+
+  const addChecklistItem = () => {
+    if (newChecklistItem.trim()) {
+      setChecklist([
+        ...checklist,
+        {
+          id: crypto.randomUUID(),
+          text: newChecklistItem,
+          isChecked: false,
+        },
+      ]);
+      setNewChecklistItem("");
+    }
+  };
+
+  const toggleChecklistItem = (itemId: string) => {
+    setChecklist(
+      checklist.map((item) =>
+        item.id === itemId
+          ? { ...item, isChecked: !item.isChecked }
+          : item
+      ),
+    );
+  };
+
+  const removeChecklistItem = (itemId: string) => {
+    setChecklist(checklist.filter((item) => item.id !== itemId));
   };
 
   if (!isOpen) return null;
@@ -164,14 +223,27 @@ export default function AddCardModal(
                       min="0"
                       max="59"
                       value={estimatedMinutes}
-                      onInput={(e) =>
-                        setEstimatedMinutes(e.currentTarget.value)}
+                      onInput={(e) => setEstimatedMinutes(e.currentTarget.value)}
                       class="w-full px-2 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white text-sm"
                       placeholder="Min"
                     />
                   </div>
                 </div>
               </div>
+
+              {/* Time Spent - Only show in edit mode */}
+              {mode === 'edit' && card?.timeSpent !== undefined && (
+                <div>
+                  <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Time Spent
+                  </div>
+                  <div class="px-3 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-400">
+                    {String(Math.floor(card.timeSpent / 3600)).padStart(2, "0")}h{" "}
+                    {String(Math.floor((card.timeSpent % 3600) / 60)).padStart(2, "0")}m{" "}
+                    {String(card.timeSpent % 60).padStart(2, "0")}s
+                  </div>
+                </div>
+              )}
 
               {/* Labels */}
               <div class="flex flex-wrap gap-2">
@@ -199,131 +271,84 @@ export default function AddCardModal(
                   Checklist
                 </div>
                 {checklist.length > 0 && (
-                  <span class="text-xs text-gray-500 dark:text-gray-400">
-                    {checklist.filter((item) => item.isChecked)
-                      .length}/{checklist.length}
-                  </span>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {checklist.filter((item) => item.isChecked).length}/
+                    {checklist.length}
+                  </div>
                 )}
               </div>
 
-              {checklist.length > 0 && (
-                <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
+              <div class="space-y-2">
+                {checklist.map((item) => (
                   <div
-                    class="h-full bg-green-500 transition-all duration-300"
-                    style={{
-                      width: `${
-                        (checklist.filter((item) => item.isChecked).length /
-                          checklist.length) * 100
-                      }%`,
-                    }}
-                  />
-                </div>
-              )}
-
-              <div
-                class="overflow-y-auto"
-                style={{ maxHeight: "calc(80vh - 550px)" }}
-              >
-                <div class="space-y-2">
-                  {checklist.map((item) => (
-                    <div key={item.id} class="flex items-center gap-2 group">
-                      <input
-                        type="checkbox"
-                        checked={item.isChecked}
-                        onChange={() => {
-                          setChecklist((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, isChecked: !i.isChecked }
-                                : i
-                            )
-                          );
-                        }}
-                        class="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
-                      />
-                      <input
-                        type="text"
-                        value={item.text}
-                        onChange={(e) => {
-                          setChecklist((prev) =>
-                            prev.map((i) =>
-                              i.id === item.id
-                                ? { ...i, text: e.target.value }
-                                : i
-                            )
-                          );
-                        }}
-                        class="flex-1 bg-transparent border-none focus:outline-none text-sm text-gray-700 dark:text-gray-300"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setChecklist((prev) =>
-                            prev.filter((i) =>
-                              i.id !== item.id
-                            )
-                          );
-                        }}
-                        class="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    key={item.id}
+                    class="flex items-center gap-2 bg-white/50 dark:bg-gray-700/50 rounded-xl p-2"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={item.isChecked}
+                      onChange={() => toggleChecklistItem(item.id)}
+                      class="rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500/50"
+                    />
+                    <span
+                      class={`flex-1 text-sm ${
+                        item.isChecked
+                          ? "line-through text-gray-400 dark:text-gray-500"
+                          : "text-gray-700 dark:text-gray-300"
+                      }`}
+                    >
+                      {item.text}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeChecklistItem(item.id)}
+                      class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
               </div>
 
-              <div class="flex gap-2 mt-3">
+              <div class="mt-2 flex gap-2">
                 <input
                   type="text"
                   value={newChecklistItem}
                   onInput={(e) => setNewChecklistItem(e.currentTarget.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      if (newChecklistItem.trim()) {
-                        setChecklist((prev) => [...prev, {
-                          id: crypto.randomUUID(),
-                          text: newChecklistItem.trim(),
-                          isChecked: false,
-                        }]);
-                        setNewChecklistItem("");
-                      }
-                    }
-                  }}
-                  class="flex-1 px-3 py-2 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white text-sm"
-                  placeholder="Add checklist item (press Enter)"
+                  onKeyDown={(e) => e.key === "Enter" && addChecklistItem()}
+                  placeholder="Add checklist item"
+                  class="flex-1 px-3 py-1.5 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white text-sm"
                 />
+                <button
+                  type="button"
+                  onClick={addChecklistItem}
+                  class="px-3 py-1.5 bg-blue-500 text-white rounded-xl text-sm hover:bg-blue-600 transition-colors"
+                >
+                  Add
+                </button>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div class="p-4 flex justify-end gap-3 flex-shrink-0">
-            <button
-              type="button"
-              onClick={onClose}
-              class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
-            >
-              Cancel
-            </button>
+          <div class="p-4 flex justify-end">
             <button
               type="submit"
-              class="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-xl transition-colors"
+              class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
             >
-              Create Task
+              {mode === 'add' ? 'Add Task' : 'Save Changes'}
             </button>
           </div>
         </form>
