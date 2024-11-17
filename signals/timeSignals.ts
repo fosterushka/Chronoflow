@@ -1,7 +1,9 @@
 import { computed, signal } from "@preact/signals";
 
+/** Current timestamp signal */
 export const currentTime = signal(Date.now());
 
+/** Computed signal for formatted time */
 export const formattedTime = computed(() => {
   const time = currentTime.value;
   const hours = Math.floor(time / 3600000);
@@ -18,6 +20,7 @@ export const formattedTime = computed(() => {
   };
 });
 
+/** Calculate elapsed time in seconds */
 export const getElapsedTime = (startTime: number) => {
   return Math.floor((currentTime.value - startTime) / 1000);
 };
@@ -33,6 +36,7 @@ if (typeof window !== "undefined") {
   timerId = globalThis.setTimeout(updateTime, 1000);
 }
 
+/** Cleanup function to clear the timer */
 export const cleanup = () => {
   if (typeof window !== "undefined" && timerId) {
     globalThis.clearTimeout(timerId);

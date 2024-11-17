@@ -8,10 +8,13 @@ export default function Error404() {
       </Head>
       <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center px-4">
         <div class="max-w-lg w-full text-center">
-          <div class="text-6xl font-bold text-gray-900 dark:text-white mb-8">404</div>
+          <div class="text-6xl font-bold text-gray-900 dark:text-white mb-8">
+            404
+          </div>
           <div class="relative">
             <div class="absolute inset-0 flex items-center justify-center">
-              <div class="w-32 h-32 bg-blue-500/10 dark:bg-blue-500/20 rounded-full animate-pulse"></div>
+              <div class="w-32 h-32 bg-blue-500/10 dark:bg-blue-500/20 rounded-full animate-pulse">
+              </div>
             </div>
             <svg
               class="w-32 h-32 mx-auto text-blue-500 relative"
@@ -31,7 +34,8 @@ export default function Error404() {
             Page not found
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-4 mb-8">
-            Sorry, we couldn't find the page you're looking for. The page might have been removed or the link might be broken.
+            Sorry, we couldn't find the page you're looking for. The page might
+            have been removed or the link might be broken.
           </p>
           <a
             href="/"

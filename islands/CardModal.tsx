@@ -174,13 +174,13 @@ export default function CardModal(
       >
         <form
           onSubmit={handleSubmit}
-          class="divide-y divide-gray-200 dark:divide-gray-700 flex flex-col"
+          class="divide-y divide-gray-200 dark:divide-gray-700 flex flex-col h-full"
         >
           {/* Header */}
           <div class="p-3 flex justify-between items-start gap-3">
             <div class="flex-1">
               <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Task Title
+                Title
               </div>
               <input
                 type="text"
@@ -193,18 +193,14 @@ export default function CardModal(
             </div>
             <button
               type="button"
-              onClick={handleClose}
-              class={`relative p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors flex-shrink-0 ${
-                isPinging
-                  ? 'after:content-[""] after:absolute after:inset-0 after:rounded-lg after:animate-ping-once after:bg-gray-400/30 dark:after:bg-gray-600/30'
-                  : ""
-              }`}
+              onClick={onClose}
+              class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
             >
               <svg
-                class="w-4 h-4"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
               >
                 <path
                   stroke-linecap="round"
@@ -224,139 +220,101 @@ export default function CardModal(
                 onClick={() => setActiveTab("task")}
                 class={`py-2 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "task"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    ? "border-blue-500 text-blue-500"
                     : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
-                Task Details
+                Task
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("github")}
                 class={`py-2 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "github"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    ? "border-blue-500 text-blue-500"
                     : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
               >
-                GitHub Issue
+                GitHub
               </button>
             </div>
           </div>
 
           {/* Content */}
-          <div class="flex-1 overflow-y-auto">
-            {activeTab === "task"
-              ? (
-                // Task Details Tab
-                <div class="p-4 space-y-4">
-                  {/* Description */}
-                  <div>
-                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Description
-                    </div>
-                    <textarea
-                      value={description}
-                      onInput={(e) => setDescription(e.currentTarget.value)}
-                      class="w-full h-24 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"
-                      placeholder="Enter task description"
-                    />
-                  </div>
-
-                  {/* Labels */}
-                  <div>
-                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Labels
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                      {labels.map((label) => (
-                        <button
-                          key={label.id}
-                          type="button"
-                          onClick={() => toggleLabel(label.id)}
-                          class={`${label.color} text-white text-xs px-3 py-1 rounded-full transition-opacity ${
-                            selectedLabels.includes(label.id)
-                              ? "opacity-100"
-                              : "opacity-40"
-                          }`}
-                        >
-                          {label.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Due Date */}
-                  <div>
-                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Due Date
-                    </div>
-                    <input
-                      type="date"
-                      value={dueDate}
-                      onInput={(e) => setDueDate(e.currentTarget.value)}
-                      class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                    />
-                  </div>
-
-                  {/* Estimated Time */}
-                  <div>
-                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Estimated Time
-                    </div>
-                    <div class="flex gap-2">
-                      <div class="flex-1">
-                        <input
-                          type="number"
-                          min="0"
-                          value={estimatedHours}
-                          onInput={(e) =>
-                            setEstimatedHours(e.currentTarget.value)}
-                          class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                          placeholder="Hours"
-                        />
+          <div class="flex-1 overflow-y-auto flex">
+            {/* Main Content */}
+            <div class="flex-1 p-4 border-r border-gray-200 dark:border-gray-700">
+              {activeTab === "task"
+                ? (
+                  <div class="space-y-4">
+                    {/* Description */}
+                    <div>
+                      <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Description
                       </div>
-                      <div class="flex-1">
-                        <input
-                          type="number"
-                          min="0"
-                          max="59"
-                          value={estimatedMinutes}
-                          onInput={(e) =>
-                            setEstimatedMinutes(e.currentTarget.value)}
-                          class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                          placeholder="Minutes"
-                        />
-                      </div>
+                      <textarea
+                        value={description}
+                        onInput={(e) => setDescription(e.currentTarget.value)}
+                        class="w-full h-24 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"
+                        placeholder="Enter task description"
+                      />
                     </div>
-                  </div>
 
-                  {/* Checklist */}
-                  <div>
-                    <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Checklist
-                    </div>
-                    <div
-                      class="space-y-2 max-h-28 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
-                      ref={setChecklistRef}
-                    >
-                      {checklist.map((item) => (
-                        <div
-                          key={item.id}
-                          class="flex items-start gap-2 group"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => toggleChecklistItem(item.id)}
-                            class={`mt-1 w-4 h-4 rounded border transition-colors flex-shrink-0 ${
-                              item.isChecked
-                                ? "bg-blue-500 border-blue-500"
-                                : "border-gray-300 dark:border-gray-600"
-                            }`}
+                    {/* Checklist */}
+                    <div>
+                      <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Checklist
+                      </div>
+                      <div
+                        class="space-y-2 max-h-28 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
+                        ref={setChecklistRef}
+                      >
+                        {checklist.map((item) => (
+                          <div
+                            key={item.id}
+                            class="flex items-start gap-2 group"
                           >
-                            {item.isChecked && (
+                            <button
+                              type="button"
+                              onClick={() => toggleChecklistItem(item.id)}
+                              class={`mt-1 w-4 h-4 rounded border transition-colors flex-shrink-0 ${
+                                item.isChecked
+                                  ? "bg-blue-500 border-blue-500"
+                                  : "border-gray-300 dark:border-gray-600"
+                              }`}
+                            >
+                              {item.isChecked && (
+                                <svg
+                                  class="w-4 h-4 text-white"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                            <span
+                              class={`flex-1 text-sm ${
+                                item.isChecked
+                                  ? "line-through text-gray-400 dark:text-gray-500"
+                                  : "text-gray-700 dark:text-gray-300"
+                              }`}
+                            >
+                              {item.text}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeChecklistItem(item.id)}
+                              class="text-gray-400 hover:text-red-500"
+                            >
                               <svg
-                                class="w-4 h-4 text-white"
+                                class="w-4 h-4"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -365,78 +323,120 @@ export default function CardModal(
                                   stroke-linecap="round"
                                   stroke-linejoin="round"
                                   stroke-width="2"
-                                  d="M5 13l4 4L19 7"
+                                  d="M6 18L18 6M6 6l12 12"
                                 />
                               </svg>
-                            )}
-                          </button>
-                          <span
-                            class={`flex-1 text-sm ${
-                              item.isChecked
-                                ? "line-through text-gray-400 dark:text-gray-500"
-                                : "text-gray-700 dark:text-gray-300"
-                            }`}
-                          >
-                            {item.text}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeChecklistItem(item.id)}
-                            class="text-gray-400 hover:text-red-500"
-                          >
-                            <svg
-                              class="w-4 h-4"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <div class="mt-2 flex gap-2">
-                      <input
-                        type="text"
-                        value={newChecklistItem}
-                        onInput={(e) =>
-                          setNewChecklistItem(e.currentTarget.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addChecklistItem();
-                          }
-                        }}
-                        class="flex-1 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                        placeholder="Add checklist item"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => addChecklistItem()}
-                        class="px-3 py-1.5 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-                      >
-                        Add
-                      </button>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <div class="mt-2 flex gap-2">
+                        <input
+                          type="text"
+                          value={newChecklistItem}
+                          onInput={(e) =>
+                            setNewChecklistItem(e.currentTarget.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addChecklistItem();
+                            }
+                          }}
+                          class="flex-1 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                          placeholder="Add checklist item"
+                        />
+                        <button
+                          type="button"
+                          onClick={addChecklistItem}
+                          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                        >
+                          Add
+                        </button>
+                      </div>
                     </div>
                   </div>
+                )
+                : (
+                  <GitHubTab
+                    description={description}
+                    selectedLabels={selectedLabels}
+                    title={title}
+                    checklist={checklist}
+                    initialData={githubData}
+                    onGithubDataChange={setGithubData}
+                  />
+                )}
+            </div>
+
+            {/* Sidebar */}
+            <div class="w-64 p-4 bg-gray-50 dark:bg-gray-800/50">
+              {/* Labels */}
+              <div class="mb-4">
+                <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Labels
                 </div>
-              )
-              : (
-                <GitHubTab
-                  description={description}
-                  selectedLabels={selectedLabels}
-                  title={title}
-                  checklist={checklist}
-                  initialData={githubData}
-                  onGithubDataChange={setGithubData}
+                <div class="flex flex-wrap gap-2">
+                  {labels.map((label) => (
+                    <button
+                      key={label.id}
+                      type="button"
+                      onClick={() => toggleLabel(label.id)}
+                      class={`${label.color} text-white text-xs px-3 py-1 rounded-full transition-opacity ${
+                        selectedLabels.includes(label.id)
+                          ? "opacity-100"
+                          : "opacity-40"
+                      }`}
+                    >
+                      {label.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Due Date */}
+              <div class="mb-4">
+                <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Due Date
+                </div>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onInput={(e) => setDueDate(e.currentTarget.value)}
+                  class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                 />
-              )}
+              </div>
+
+              {/* Estimated Time */}
+              <div>
+                <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Estimated Time
+                </div>
+                <div class="flex gap-2">
+                  <div class="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      value={estimatedHours}
+                      onInput={(e) => setEstimatedHours(e.currentTarget.value)}
+                      class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                      placeholder="Hours"
+                    />
+                  </div>
+                  <div class="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      max="59"
+                      value={estimatedMinutes}
+                      onInput={(e) =>
+                        setEstimatedMinutes(e.currentTarget.value)}
+                      class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                      placeholder="Minutes"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Footer */}

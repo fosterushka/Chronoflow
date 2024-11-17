@@ -193,7 +193,7 @@ export default function GitHubTab({
     if (checklist?.length > 0) {
       checklistMd += "\n\n### Checklist\n";
       checklist.forEach((item) => {
-        checklistMd += `\n- [${item.isChecked ? 'x' : ' '}] ${item.text}`;
+        checklistMd += `\n- [${item.isChecked ? "x" : " "}] ${item.text}`;
       });
     }
 

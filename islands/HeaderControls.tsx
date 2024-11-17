@@ -20,6 +20,8 @@ export default function HeaderControls() {
     return [];
   });
 
+  const formatedNowTime = new Date(currentTime).toLocaleString("en-GB");
+
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [userName, setUserName] = useState("");
@@ -37,6 +39,11 @@ export default function HeaderControls() {
     }
   }, []);
 
+  /**
+   * Handles the completion of the welcome process.
+   * Sets the intro as seen, saves the user's name, updates the state, and closes the welcome modal.
+   * @param {string} name - The name entered by the user
+   */
   const handleWelcomeComplete = (name: string) => {
     localStorage.setItem("chronoflowIntroSeen", "true");
     localStorage.setItem("chronoflowUserName", name);
@@ -44,6 +51,10 @@ export default function HeaderControls() {
     setShowWelcome(false);
   };
 
+  /**
+   * Handles skipping the welcome process.
+   * Sets the intro as seen and closes the welcome modal without saving a name.
+   */
   const handleWelcomeSkip = () => {
     localStorage.setItem("chronoflowIntroSeen", "true");
     setShowWelcome(false);
@@ -55,19 +66,19 @@ export default function HeaderControls() {
 
     const greetings = [
       {
-        condition: hour >= 0 && hour < 12,
+        condition: hour >= 6 && hour < 12,
         text: "Good morning",
         icon:
           '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
       },
       {
-        condition: hour >= 12 && hour < 17,
+        condition: hour >= 12 && hour <= 18,
         text: "Good day",
         icon:
           '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
       },
       {
-        condition: hour >= 17,
+        condition: true,
         text: "Good evening",
         icon:
           '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>',
@@ -91,7 +102,7 @@ export default function HeaderControls() {
 
       greetingDiv.appendChild(iconDiv);
       greetingDiv.appendChild(
-        document.createTextNode(userName ? ` ${text}, ${userName}` : text),
+        document.createTextNode(userName ? ` ${text}, ${userName} ` : text),
       );
       greetingContainer.appendChild(greetingDiv);
     }
@@ -196,6 +207,11 @@ export default function HeaderControls() {
           <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
         </>
       )}
+
+      <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+        <span>Time is {formatedNowTime}</span>
+      </div>
+
       <div class="relative group">
         <button
           onClick={handleClearStorage}
