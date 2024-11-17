@@ -8,7 +8,7 @@ interface ChangelogModalProps {
 export const changelog = [
   {
     version: "0.0.4",
-    date: "17/1 1/2024",
+    date: "17/11/2024",
     changes: [
       "Welcoming screen",
       "Added GitHub issue creation",
@@ -59,7 +59,7 @@ export const changelog = [
 export default function ChangelogModal(
   { isOpen, onClose }: ChangelogModalProps,
 ): JSX.Element {
-  if (!isOpen) return null;
+  if (!isOpen) return <></>;
 
   return (
     <div class="fixed inset-0 z-50 overflow-y-auto">

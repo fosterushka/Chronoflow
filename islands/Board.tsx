@@ -495,12 +495,12 @@ export default function Board() {
           {columns.map((column) => (
             <div
               key={column.id}
-              class="flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm min-w-0"
+              class="flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl min-w-0"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
             >
-              <div class="shrink-0 px-4 min-h-14 py-2 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
-                <div class="flex items-center gap-2 min-w-0">
+              <div class="shrink-0 px-4 min-h-10 py-1 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
+                <div class="flex items-center gap-1 min-w-0">
                   <div
                     class={`shrink-0 w-2 h-2 rounded-full ${
                       column.id === TaskStateTypes.TODO

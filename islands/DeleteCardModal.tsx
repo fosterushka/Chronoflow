@@ -20,10 +20,10 @@ export default function DeleteCardModal(
 
   return (
     <div class="fixed inset-0 bg-black/70 flex items-start justify-center p-4 z-50">
-      <div class="w-full max-w-2xl bg-white/80 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50">
+      <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
         <form
           onSubmit={handleSubmit}
-          class="divide-y divide-gray-200/50 dark:divide-gray-700/50"
+          class="divide-y divide-gray-200 dark:divide-gray-700"
         >
           {/* Header */}
           <div class="p-4 flex justify-between items-center">

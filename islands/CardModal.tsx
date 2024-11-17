@@ -204,13 +204,13 @@ export default function CardModal(
       onClick={handleBackdropClick}
     >
       <div
-        class={`w-full max-w-2xl bg-white/80 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 my-2 flex flex-col transition-transform ${
+        class={`w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 my-2 flex flex-col transition-transform ${
           isShaking ? "animate-shake" : ""
         }`}
       >
         <form
           onSubmit={handleSubmit}
-          class="divide-y divide-gray-200/50 dark:divide-gray-700/50 flex flex-col"
+          class="divide-y divide-gray-200 dark:divide-gray-700 flex flex-col"
         >
           {/* Header */}
           <div class="p-3 flex justify-between items-start gap-3">
@@ -223,7 +223,7 @@ export default function CardModal(
                 required
                 value={title}
                 onInput={(e) => setTitle(e.currentTarget.value)}
-                class="w-full text-base font-medium bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white"
+                class="w-full text-base font-medium bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                 placeholder="Enter task title"
               />
             </div>
@@ -253,7 +253,7 @@ export default function CardModal(
           </div>
 
           {/* Tabs */}
-          <div class="border-b border-gray-200/50 dark:border-gray-700/50">
+          <div class="border-b border-gray-200 dark:border-gray-700">
             <div class="flex gap-4 px-4">
               <button
                 type="button"
@@ -293,7 +293,7 @@ export default function CardModal(
                   <textarea
                     value={description}
                     onInput={(e) => setDescription(e.currentTarget.value)}
-                    class="w-full h-24 text-sm bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white resize-none"
+                    class="w-full h-24 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"
                     placeholder="Enter task description"
                   />
                 </div>
@@ -330,7 +330,7 @@ export default function CardModal(
                     type="date"
                     value={dueDate}
                     onInput={(e) => setDueDate(e.currentTarget.value)}
-                    class="w-full text-sm bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white"
+                    class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                   />
                 </div>
 
@@ -347,7 +347,7 @@ export default function CardModal(
                         value={estimatedHours}
                         onInput={(e) =>
                           setEstimatedHours(e.currentTarget.value)}
-                        class="w-full text-sm bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white"
+                        class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                         placeholder="Hours"
                       />
                     </div>
@@ -359,7 +359,7 @@ export default function CardModal(
                         value={estimatedMinutes}
                         onInput={(e) =>
                           setEstimatedMinutes(e.currentTarget.value)}
-                        class="w-full text-sm bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white"
+                        class="w-full text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                         placeholder="Minutes"
                       />
                     </div>
@@ -445,7 +445,7 @@ export default function CardModal(
                           addChecklistItem();
                         }
                       }}
-                      class="flex-1 text-sm bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white"
+                      class="flex-1 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
                       placeholder="Add checklist item"
                     />
                     <button
