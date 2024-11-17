@@ -1,8 +1,27 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { JSX } from "preact";
 import { clearStorage, exportData, importData } from "../utils/boardUtils.ts";
 import type { Card, Column } from "../types/index.ts";
 import ChangelogModal from "./ChangelogModal.tsx";
+import WelcomeModal from "./WelcomeModal.tsx";
+import { Signal } from "@preact/signals";
+import { changelog } from "./ChangelogModal.tsx";
+
+interface TimerProps {
+  currentTime: number;
+  setCurrentTime: (time: number) => void;
+}
+
+function Timer({ currentTime, setCurrentTime }: TimerProps) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setCurrentTime]);
+
+  return <></>;
+}
 
 export default function HeaderControls() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -13,8 +32,83 @@ export default function HeaderControls() {
     return [];
   });
 
-  const [isChangelogOpen, setIsChangelogOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const hasSeenIntro = localStorage.getItem("chronoflowIntroSeen");
+    const savedName = localStorage.getItem("chronoflowUserName");
+
+    if (!hasSeenIntro) {
+      setShowWelcome(true);
+    }
+
+    if (savedName) {
+      setUserName(savedName);
+    }
+  }, []);
+
+  const handleWelcomeComplete = (name: string) => {
+    localStorage.setItem("chronoflowIntroSeen", "true");
+    localStorage.setItem("chronoflowUserName", name);
+    setUserName(name);
+    setShowWelcome(false);
+  };
+
+  const handleWelcomeSkip = () => {
+    localStorage.setItem("chronoflowIntroSeen", "true");
+    setShowWelcome(false);
+  };
+
+  //TODO: interface and tests.
+  const getGreeting: any = () => {
+    const hour = new Date().getHours();
+
+    const greetings = [
+      {
+        condition: hour >= 0 && hour < 12,
+        text: "Good morning",
+        icon:
+          '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
+      },
+      {
+        condition: hour >= 12 && hour < 17,
+        text: "Good day",
+        icon:
+          '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
+      },
+      {
+        condition: hour >= 17,
+        text: "Good evening",
+        icon:
+          '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>',
+      },
+    ];
+
+    return greetings.find((g) => g.condition);
+  };
+
+  useEffect(() => {
+    const greetingContainer = document.getElementById("greeting-container");
+    if (greetingContainer) {
+      const { text, icon } = getGreeting();
+      greetingContainer.innerHTML = "";
+      const greetingDiv = document.createElement("div");
+      greetingDiv.className =
+        "flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300";
+
+      const iconDiv = document.createElement("div");
+      iconDiv.innerHTML = icon;
+
+      greetingDiv.appendChild(iconDiv);
+      greetingDiv.appendChild(
+        document.createTextNode(userName ? ` ${text}, ${userName}` : text),
+      );
+      greetingContainer.appendChild(greetingDiv);
+    }
+  }, [userName]);
 
   //TODO: could be done better
   const formatTime = (seconds: number) => {
@@ -58,14 +152,6 @@ export default function HeaderControls() {
     return "text-emerald-500 dark:text-emerald-400";
   };
 
-  //TODO: bottleneck: Update timer every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Listen for board updates
   useEffect(() => {
     const handleBoardUpdate = (e: Event) => {
@@ -99,6 +185,7 @@ export default function HeaderControls() {
 
   return (
     <div class="flex items-center gap-2">
+      <Timer currentTime={currentTime} setCurrentTime={setCurrentTime} />
       {trackedTask && (
         <>
           <div class="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
@@ -153,7 +240,8 @@ export default function HeaderControls() {
       <div class="relative group">
         <button
           onClick={handleExport}
-          class="flex items-center justify-center p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+          disabled={columns.every((col) => col.cards.length === 0)}
+          class="flex items-center justify-center p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg
             class="w-4 h-4"
@@ -203,12 +291,16 @@ export default function HeaderControls() {
 
       <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
 
-      <div class="relative group">
+      <div class="relative group flex items-center gap-2">
+        {userName && (
+          <div id="greeting-container" class="text-gray-900 dark:text-white">
+          </div>
+        )}
         <button
           onClick={() => setIsChangelogOpen(true)}
-          class="flex items-center justify-center p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 rounded-lg transition-colors"
+          class="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
-          <span class="text-xs">0.0.3</span>
+          <span class="text-xs">{changelog[0].version}</span>
         </button>
         <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           View Changelog
@@ -218,6 +310,12 @@ export default function HeaderControls() {
       <ChangelogModal
         isOpen={isChangelogOpen}
         onClose={() => setIsChangelogOpen(false)}
+      />
+
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={handleWelcomeSkip}
+        onComplete={handleWelcomeComplete}
       />
     </div>
   );

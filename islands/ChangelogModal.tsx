@@ -5,7 +5,19 @@ interface ChangelogModalProps {
   onClose: () => void;
 }
 
-const changelog = [
+export const changelog = [
+  {
+    version: "0.0.4",
+    date: "17/1 1/2024",
+    changes: [
+      "Welcoming screen",
+      "Added GitHub issue creation",
+      "Improved GitHub integration",
+      "Added caching and memoization on some part of app",
+      "Streamlined data structure for better performance",
+      "Added loading indicators",
+    ],
+  },
   {
     version: "0.0.3",
     date: "16/11/2024",

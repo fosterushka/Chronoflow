@@ -10,8 +10,10 @@ import * as $CardModal from "./islands/CardModal.tsx";
 import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
 import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
+import * as $GitHubTab from "./islands/GitHubTab.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
+import * as $WelcomeModal from "./islands/WelcomeModal.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -26,8 +28,10 @@ const manifest = {
     "./islands/ChangelogModal.tsx": $ChangelogModal,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
     "./islands/DeleteCardModal.tsx": $DeleteCardModal,
+    "./islands/GitHubTab.tsx": $GitHubTab,
     "./islands/HeaderControls.tsx": $HeaderControls,
     "./islands/Statistics.tsx": $Statistics,
+    "./islands/WelcomeModal.tsx": $WelcomeModal,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

@@ -30,9 +30,11 @@ export function clearStorage(setColumns: (cols: Column[]) => void) {
     confirm("Are you sure you want to clear all data? This cannot be undone.")
   ) {
     const emptyColumns = COLUMNS.map((col) => ({ ...col, cards: [] }));
+    localStorage.clear();
     localStorage.setItem("chronoflowColumns", JSON.stringify(emptyColumns));
     setColumns(emptyColumns);
     dispatchBoardUpdate(emptyColumns);
+    globalThis.location.reload();
   }
 }
 

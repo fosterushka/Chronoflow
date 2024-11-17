@@ -93,6 +93,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Release Notes
 
+### v0.0.4 (2024-01-24)
+
+#### 🚀 GitHub Integration
+
+- Improved GitHub integration
+- Added caching and memoization on some part of app
+- Streamlined data structure for better performance
+- Added loading indicators
+
 ### v0.0.3
 
     - Converted sidebar to sticky header for better space utilization

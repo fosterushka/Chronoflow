@@ -10,20 +10,38 @@ export interface ChecklistItem {
   isChecked: boolean;
 }
 
+export interface GitHubContributor {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  url: string;
+  html_url: string;
+  starred_url: string;
+  repos_url: string;
+  type: string;
+  contributions: number;
+}
+
+export interface GitHubData {
+  repo: string;
+  assignees: string[];
+  cachedContributors: GitHubContributor[];
+}
+
 export interface Card {
-  id: string;
+  id?: string;
   title: string;
   description: string;
   labels: string[];
   dueDate?: string;
   estimatedTime?: number;
-  timeSpent: number;
-  isTracking: boolean;
+  timeSpent?: number;
+  isTracking?: boolean;
   lastTrackingStart?: number;
   currentElapsedTime?: number;
   checklist: ChecklistItem[];
-  githubRepo?: string;
-  githubAssignee?: string;
+  github?: GitHubData;
 }
 
 export interface Column {

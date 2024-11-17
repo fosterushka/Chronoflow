@@ -8,19 +8,15 @@ import CardPreview from "../components/CardPreview.tsx";
 import {
   BOARD_UPDATE_EVENT,
   COLUMNS,
-  LABELS,
   dispatchBoardUpdate,
+  LABELS,
 } from "../utils/boardUtils.ts";
-import type {
-  Card,
-  Column,
-  DraggedCard,
-  EditingCard,
-  Label,
-} from "../types/index.ts";
+import type { Card, Column, DraggedCard, EditingCard } from "../types/index.ts";
+import { TaskStateTypes } from "../types/TaskStateTypes.ts";
 
 export default function Board() {
   const [columns, setColumns] = useState<Column[]>(() => {
+    //TODO: eliminate double if statement
     if (typeof localStorage !== "undefined") {
       const savedData = localStorage.getItem("chronoflowColumns");
       if (savedData) {
@@ -163,10 +159,10 @@ export default function Board() {
 
     const { card, columnId: sourceColumnId } = draggedCard;
     if (sourceColumnId === targetColumnId) return;
-
     // Stop tracking when moving to todo or done
     if (
-      (targetColumnId === "todo" || targetColumnId === "done") &&
+      (targetColumnId === TaskStateTypes.TODO ||
+        targetColumnId === TaskStateTypes.DONE) &&
       card.isTracking
     ) {
       const elapsedTime = Math.floor(
@@ -205,7 +201,9 @@ export default function Board() {
 
   const toggleTracking = useCallback((columnId: string, cardId: string) => {
     // Don't allow tracking in todo or done columns
-    if (columnId === "todo" || columnId === "done") return;
+    if (columnId === TaskStateTypes.TODO || columnId === TaskStateTypes.DONE) {
+      return;
+    }
 
     setColumns((prevColumns) => {
       const targetCard = prevColumns
@@ -336,7 +334,7 @@ export default function Board() {
       0,
     );
     const completedTasks = columns.find((col: { id: string }) =>
-      col.id === "done"
+      col.id === TaskStateTypes.DONE
     )?.cards.length || 0;
     const totalEstimatedTime = columns.reduce(
       (acc: any, col: { cards: any[] }) =>
@@ -384,7 +382,7 @@ export default function Board() {
       card.timeSpent <= estimatedTimeInSeconds;
   };
 
-  const getTimeBasedColor = (card: Card, columnId: string) => {
+  const getTimeBasedColor = (card: Card) => {
     if (card.isTracking) {
       const estimatedTimeInSeconds = card.estimatedTime
         ? card.estimatedTime * 60
@@ -460,9 +458,12 @@ export default function Board() {
                 />
               </svg>
             </div>
-            <h1 class="font-semibold text-gray-700 dark:text-white text-sm">
-              Chronoflow
-            </h1>
+            <div class="flex items-center gap-2">
+              <h1 class="font-semibold text-gray-700 dark:text-white text-sm">
+                Chronoflow
+              </h1>
+              <div id="greeting-container" />
+            </div>
           </div>
 
           <div class="flex items-center gap-4">
@@ -491,24 +492,24 @@ export default function Board() {
 
       <div class="flex-1 p-6 bg-gray-100/50 dark:bg-gray-900 min-h-0">
         <div class="grid grid-cols-5 gap-4 h-full auto-rows-fr">
-          {columns.map((column, index) => (
+          {columns.map((column) => (
             <div
               key={column.id}
               class="flex flex-col bg-gray-200/50 dark:bg-gray-800/50 rounded-xl backdrop-blur-sm min-w-0"
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
             >
-              <div class="shrink-0 px-4 py-3 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
+              <div class="shrink-0 px-4 min-h-14 py-2 flex justify-between items-center border-b border-gray-300/50 dark:border-gray-700">
                 <div class="flex items-center gap-2 min-w-0">
                   <div
                     class={`shrink-0 w-2 h-2 rounded-full ${
-                      column.id === "todo"
+                      column.id === TaskStateTypes.TODO
                         ? "bg-indigo-500"
-                        : column.id === "inProgress"
+                        : column.id === TaskStateTypes.IN_PROGRESS
                         ? "bg-amber-500"
-                        : column.id === "codeReview"
+                        : column.id === TaskStateTypes.CODE_REVIEW
                         ? "bg-purple-500"
-                        : column.id === "testing"
+                        : column.id === TaskStateTypes.TESTING
                         ? "bg-blue-500"
                         : "bg-emerald-500"
                     }`}
@@ -522,7 +523,7 @@ export default function Board() {
                   </span>
                 </div>
                 {/* //TODO: move to const types */}
-                {column.id !== "done" && (
+                {column.id !== TaskStateTypes.DONE && (
                   <div class="flex gap-2">
                     <button
                       onClick={() => openAddModal(column.id)}
