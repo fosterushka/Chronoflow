@@ -34,12 +34,12 @@ export interface Card {
   title: string;
   description: string;
   labels: string[];
-  dueDate?: string;
-  estimatedTime?: number;
-  timeSpent?: number;
-  isTracking?: boolean;
-  lastTrackingStart?: number;
-  currentElapsedTime?: number;
+  dueDate: string;
+  estimatedTime: number;
+  timeSpent: number;
+  isTracking: boolean;
+  lastTrackingStart: number;
+  currentElapsedTime: number;
   checklist: ChecklistItem[];
   github?: GitHubData;
 }

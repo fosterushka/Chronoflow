@@ -24,41 +24,9 @@ const features = [
       "Monitor project progress and optimize productivity with built-in time tracking",
   },
   {
-    title: "Customizable Workflows",
-    description:
-      "Tailor the board to fit your unique process and boost team efficiency",
-  },
-  {
     title: "Continuous Improvement",
     description:
       "We're constantly adding new features based on user feedback - your ideas shape our future!",
-  },
-  {
-    title: "What's New in Version 0.0.4",
-    description: (
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-            Version 0.0.4
-          </h3>
-          <div class="space-y-4">
-            <div>
-              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                🚀 GitHub Integration
-              </h4>
-              <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>Welcoming screen</li>
-                <li>Added GitHub issue creation</li>
-                <li>Improved GitHub integration</li>
-                <li>Added caching and memoization on some part of app</li>
-                <li>Streamlined data structure for better performance</li>
-                <li>Added loading indicators</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
   },
 ];
 

@@ -1,27 +1,15 @@
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
 import { clearStorage, exportData, importData } from "../utils/boardUtils.ts";
 import type { Card, Column } from "../types/index.ts";
 import ChangelogModal from "./ChangelogModal.tsx";
 import WelcomeModal from "./WelcomeModal.tsx";
-import { Signal } from "@preact/signals";
 import { changelog } from "./ChangelogModal.tsx";
-
-interface TimerProps {
-  currentTime: number;
-  setCurrentTime: (time: number) => void;
-}
-
-function Timer({ currentTime, setCurrentTime }: TimerProps) {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [setCurrentTime]);
-
-  return <></>;
-}
+import {
+  currentTime,
+  formattedTime,
+  getElapsedTime,
+} from "../signals/timeSignals.ts";
 
 export default function HeaderControls() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -32,7 +20,6 @@ export default function HeaderControls() {
     return [];
   });
 
-  const [currentTime, setCurrentTime] = useState(Date.now());
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [userName, setUserName] = useState("");
@@ -120,13 +107,15 @@ export default function HeaderControls() {
     }:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Get currently tracked task
   //TODO: bug if you move to done or todo still tracking time
   const getTrackedTask = () => {
     for (const column of columns) {
       const trackedCard = column.cards.find((card) => card.isTracking);
       if (trackedCard) {
-        return { card: trackedCard, columnId: column.id };
+        return {
+          card: trackedCard,
+          columnId: column.id,
+        };
       }
     }
     return null;
@@ -138,9 +127,7 @@ export default function HeaderControls() {
     const estimatedTimeInSeconds = card.estimatedTime
       ? card.estimatedTime * 60
       : 0;
-    const currentElapsedTime = Math.floor(
-      (currentTime - (card.lastTrackingStart || 0)) / 1000,
-    );
+    const currentElapsedTime = getElapsedTime(card.lastTrackingStart || 0);
     const totalTime = (card.timeSpent || 0) + currentElapsedTime;
 
     if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
@@ -151,6 +138,8 @@ export default function HeaderControls() {
     }
     return "text-emerald-500 dark:text-emerald-400";
   };
+
+  const trackedTask = getTrackedTask();
 
   // Listen for board updates
   useEffect(() => {
@@ -181,11 +170,8 @@ export default function HeaderControls() {
     input.value = "";
   };
 
-  const trackedTask = getTrackedTask();
-
   return (
     <div class="flex items-center gap-2">
-      <Timer currentTime={currentTime} setCurrentTime={setCurrentTime} />
       {trackedTask && (
         <>
           <div class="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
@@ -202,11 +188,8 @@ export default function HeaderControls() {
               }`}
             >
               {formatTime(
-                (trackedTask.card.timeSpent || 0) +
-                  Math.floor(
-                    (currentTime - (trackedTask.card.lastTrackingStart || 0)) /
-                      1000,
-                  ),
+                trackedTask.card.timeSpent +
+                  getElapsedTime(trackedTask.card.lastTrackingStart || 0),
               )}
             </span>
           </div>
@@ -216,7 +199,7 @@ export default function HeaderControls() {
       <div class="relative group">
         <button
           onClick={handleClearStorage}
-          class="flex items-center justify-center p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+          class="flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
         >
           <svg
             class="w-4 h-4"
@@ -232,7 +215,7 @@ export default function HeaderControls() {
             />
           </svg>
         </button>
-        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
+        <span class="absolute px-2 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           Clear All Data
         </span>
       </div>
@@ -241,7 +224,7 @@ export default function HeaderControls() {
         <button
           onClick={handleExport}
           disabled={columns.every((col) => col.cards.length === 0)}
-          class="flex items-center justify-center p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex items-center justify-center p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg
             class="w-4 h-4"
@@ -257,13 +240,13 @@ export default function HeaderControls() {
             />
           </svg>
         </button>
-        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
+        <span class="absolute px-2 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           Export Board
         </span>
       </div>
 
       <div class="relative group">
-        <label class="flex items-center justify-center p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer">
+        <label class="flex items-center justify-center text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer">
           <svg
             class="w-4 h-4"
             fill="none"

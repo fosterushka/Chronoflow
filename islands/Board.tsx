@@ -13,28 +13,37 @@ import {
 } from "../utils/boardUtils.ts";
 import type { Card, Column, DraggedCard, EditingCard } from "../types/index.ts";
 import { TaskStateTypes } from "../types/TaskStateTypes.ts";
+import { currentTime, getElapsedTime } from "../signals/timeSignals.ts";
 
 export default function Board() {
   const [columns, setColumns] = useState<Column[]>(() => {
-    //TODO: eliminate double if statement
-    if (typeof localStorage !== "undefined") {
-      const savedData = localStorage.getItem("chronoflowColumns");
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        return parsedData.map((col: Column) => ({
-          ...col,
-          cards: col.cards.map((card) => ({
-            ...card,
-            timeSpent: card.timeSpent || 0,
-            isTracking: false,
-            lastTrackingStart: undefined,
-            currentElapsedTime: 0,
-          })),
-        }));
-      }
-      return COLUMNS.map((col) => ({ ...col, cards: [] }));
+    const defaultColumns = COLUMNS.map((col) => ({ ...col, cards: [] }));
+
+    if (typeof localStorage === "undefined") {
+      return defaultColumns;
     }
-    return COLUMNS.map((col) => ({ ...col, cards: [] }));
+
+    const savedData = localStorage.getItem("chronoflowColumns");
+    if (!savedData) {
+      return defaultColumns;
+    }
+
+    try {
+      const parsedData = JSON.parse(savedData);
+      return parsedData.map((col: Column) => ({
+        ...col,
+        cards: col.cards.map((card) => ({
+          ...card,
+          timeSpent: card.timeSpent || 0,
+          isTracking: false,
+          lastTrackingStart: undefined,
+          currentElapsedTime: 0,
+        })),
+      }));
+    } catch (error) {
+      console.error("Error parsing saved columns:", error);
+      return defaultColumns;
+    }
   });
 
   const [draggedCard, setDraggedCard] = useState<DraggedCard | null>(null);
@@ -45,15 +54,7 @@ export default function Board() {
     { card: Card; columnId: string } | null
   >(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(Date.now());
   const [isLabelsCollapsed, setIsLabelsCollapsed] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     setColumns((prevColumns) => {
@@ -63,27 +64,17 @@ export default function Board() {
         cards: column.cards.map((card) => {
           if (card.isTracking) {
             hasUpdates = true;
-            // Don't add to timeSpent, just calculate current elapsed time
-            const elapsedTime = Math.floor(
-              (currentTime - (card.lastTrackingStart || 0)) / 1000,
-            );
             return {
               ...card,
-              // Keep original timeSpent and just update lastTrackingStart
-              lastTrackingStart: card.lastTrackingStart,
-              // Store current elapsed time separately for display
-              currentElapsedTime: elapsedTime,
+              currentElapsedTime: getElapsedTime(card.lastTrackingStart || 0),
             };
           }
-          return {
-            ...card,
-            currentElapsedTime: 0,
-          };
+          return card;
         }),
       }));
       return hasUpdates ? newColumns : prevColumns;
     });
-  }, [currentTime]);
+  }, [currentTime.value]);
 
   useEffect(() => {
     const handleBoardUpdate = (e: Event) => {
@@ -165,9 +156,7 @@ export default function Board() {
         targetColumnId === TaskStateTypes.DONE) &&
       card.isTracking
     ) {
-      const elapsedTime = Math.floor(
-        (Date.now() - (card.lastTrackingStart || 0)) / 1000,
-      );
+      const elapsedTime = getElapsedTime(card.lastTrackingStart || 0);
       card.isTracking = false;
       card.lastTrackingStart = undefined;
       card.currentElapsedTime = 0;
@@ -199,76 +188,71 @@ export default function Board() {
     setDraggedCard(null);
   }, [draggedCard]);
 
-  const toggleTracking = useCallback((columnId: string, cardId: string) => {
-    // Don't allow tracking in todo or done columns
-    if (columnId === TaskStateTypes.TODO || columnId === TaskStateTypes.DONE) {
-      return;
-    }
+  const handleTrackingToggle = useCallback(
+    (columnId: string, cardId: string) => {
+      const now = currentTime.value;
+      setColumns((prevColumns) => {
+        const targetCard = prevColumns
+          .find((col) => col.id === columnId)
+          ?.cards.find((card) => card.id === cardId);
 
-    setColumns((prevColumns) => {
-      const targetCard = prevColumns
-        .find((col) => col.id === columnId)
-        ?.cards.find((card) => card.id === cardId);
-
-      let newColumns;
-      if (targetCard && !targetCard.isTracking) {
-        // Start tracking
-        newColumns = prevColumns.map((column) => ({
-          ...column,
-          cards: column.cards.map((card) => {
-            if (card.id === cardId && column.id === columnId) {
-              return {
-                ...card,
-                isTracking: true,
-                lastTrackingStart: Date.now(),
-                currentElapsedTime: 0,
-              };
-            } else if (card.isTracking) {
-              // Stop tracking any other card that was being tracked
-              const elapsedTime = Math.floor(
-                (Date.now() - (card.lastTrackingStart || 0)) / 1000,
-              );
-              return {
-                ...card,
-                isTracking: false,
-                lastTrackingStart: undefined,
-                currentElapsedTime: 0,
-                timeSpent: (card.timeSpent || 0) + elapsedTime,
-              };
-            }
-            return card;
-          }),
-        }));
-        // Save to localStorage and dispatch update when starting tracking
-        localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
-        dispatchBoardUpdate(newColumns);
-      } else {
-        // Stop tracking
-        newColumns = prevColumns.map((column) => ({
-          ...column,
-          cards: column.cards.map((card) => {
-            if (card.id === cardId && column.id === columnId) {
-              const elapsedTime = Math.floor(
-                (Date.now() - (card.lastTrackingStart || 0)) / 1000,
-              );
-              return {
-                ...card,
-                isTracking: false,
-                lastTrackingStart: undefined,
-                currentElapsedTime: 0,
-                timeSpent: (card.timeSpent || 0) + elapsedTime,
-              };
-            }
-            return card;
-          }),
-        }));
-        // Save to localStorage and dispatch update when stopping tracking
-        localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
-        dispatchBoardUpdate(newColumns);
-      }
-      return newColumns;
-    });
-  }, []);
+        let newColumns;
+        if (targetCard && !targetCard.isTracking) {
+          // Start tracking
+          newColumns = prevColumns.map((column) => ({
+            ...column,
+            cards: column.cards.map((card) => {
+              if (card.id === cardId && column.id === columnId) {
+                return {
+                  ...card,
+                  isTracking: true,
+                  lastTrackingStart: now,
+                  currentElapsedTime: 0,
+                };
+              } else if (card.isTracking) {
+                // Stop tracking any other card that was being tracked
+                const elapsedTime = getElapsedTime(card.lastTrackingStart || 0);
+                return {
+                  ...card,
+                  isTracking: false,
+                  lastTrackingStart: undefined,
+                  currentElapsedTime: 0,
+                  timeSpent: (card.timeSpent || 0) + elapsedTime,
+                };
+              }
+              return card;
+            }),
+          }));
+          // Save to localStorage and dispatch update when starting tracking
+          localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+          dispatchBoardUpdate(newColumns);
+        } else {
+          // Stop tracking
+          newColumns = prevColumns.map((column) => ({
+            ...column,
+            cards: column.cards.map((card) => {
+              if (card.id === cardId && column.id === columnId) {
+                const elapsedTime = getElapsedTime(card.lastTrackingStart || 0);
+                return {
+                  ...card,
+                  isTracking: false,
+                  lastTrackingStart: undefined,
+                  currentElapsedTime: 0,
+                  timeSpent: (card.timeSpent || 0) + elapsedTime,
+                };
+              }
+              return card;
+            }),
+          }));
+          // Save to localStorage and dispatch update when stopping tracking
+          localStorage.setItem("chronoflowColumns", JSON.stringify(newColumns));
+          dispatchBoardUpdate(newColumns);
+        }
+        return newColumns;
+      });
+    },
+    [currentTime.value],
+  );
 
   const openAddModal = useCallback((columnId: string) => {
     setActiveColumn(columnId);
@@ -330,7 +314,7 @@ export default function Board() {
   //TODO: typesing everything and move into interfaces.
   const getStatistics = useCallback(() => {
     const totalTasks = columns.reduce(
-      (acc: any, col: { cards: string | any[] }) => acc + col.cards.length,
+      (acc: any, col: { cards: any[] }) => acc + col.cards.length,
       0,
     );
     const completedTasks = columns.find((col: { id: string }) =>
@@ -339,7 +323,7 @@ export default function Board() {
     const totalEstimatedTime = columns.reduce(
       (acc: any, col: { cards: any[] }) =>
         acc +
-        col.cards.reduce((sum: any, card: { estimatedTime: any }) =>
+        col.cards.reduce((sum: number, card: { estimatedTime: number }) =>
           sum + (card.estimatedTime || 0), 0),
       0,
     );
@@ -347,7 +331,8 @@ export default function Board() {
       (acc: any, col: { cards: any[] }) =>
         acc +
         col.cards.reduce(
-          (sum: any, card: { timeSpent: any }) => sum + (card.timeSpent || 0),
+          (sum: number, card: { timeSpent: number }) =>
+            sum + (card.timeSpent || 0),
           0,
         ),
       0,
@@ -374,7 +359,7 @@ export default function Board() {
     return card.timeSpent > estimatedTimeInSeconds;
   };
 
-  const isNearingEstimatedTime = (card: Card) => {
+  const isHalfwayThroughEstimatedTime = (card: Card) => {
     if (!card.estimatedTime) return false;
     const estimatedTimeInSeconds = card.estimatedTime * 60;
     const halfTime = estimatedTimeInSeconds / 2;
@@ -387,9 +372,7 @@ export default function Board() {
       const estimatedTimeInSeconds = card.estimatedTime
         ? card.estimatedTime * 60
         : 0;
-      const currentElapsedTime = Math.floor(
-        (Date.now() - (card.lastTrackingStart || 0)) / 1000,
-      );
+      const currentElapsedTime = getElapsedTime(card.lastTrackingStart || 0);
       const totalTime = card.timeSpent + currentElapsedTime;
 
       if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
@@ -398,16 +381,16 @@ export default function Board() {
       if (estimatedTimeInSeconds && totalTime >= estimatedTimeInSeconds / 2) {
         return "bg-amber-100/90 dark:bg-amber-900/90";
       }
-      return "bg-white dark:bg-gray-800/90";
+      return "bg-emerald-100/90 dark:bg-emerald-900/90";
     }
 
     if (hasExceededEstimatedTime(card)) {
-      return "bg-red-50/80 dark:bg-red-900/30 ring-2 ring-red-500/50";
+      return "bg-red-50/90 dark:bg-red-900/20";
     }
-    if (isNearingEstimatedTime(card)) {
-      return "bg-amber-50/80 dark:bg-amber-900/30 ring-1 ring-amber-500/50";
+    if (isHalfwayThroughEstimatedTime(card)) {
+      return "bg-amber-50/90 dark:bg-amber-900/20";
     }
-    return "bg-white dark:bg-gray-800/90";
+    return "bg-white/90 dark:bg-gray-800/90";
   };
 
   const handleDeleteCard = (card: Card, columnId: string) => {
@@ -527,7 +510,7 @@ export default function Board() {
                   <div class="flex gap-2">
                     <button
                       onClick={() => openAddModal(column.id)}
-                      class="w-full px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      class="w-full px-1 py-1 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                       <svg
                         class="w-4 h-4"
@@ -565,7 +548,7 @@ export default function Board() {
                         onClick={() => openEditModal(card, column.id)}
                         onTrackingToggle={(e) => {
                           e.stopPropagation();
-                          toggleTracking(column.id, card.id);
+                          handleTrackingToggle(column.id, card.id);
                         }}
                         onDelete={(e) => {
                           e.stopPropagation();
