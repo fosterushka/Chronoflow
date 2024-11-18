@@ -273,7 +273,13 @@ export default function Board() {
           ...column,
           cards: column.cards.map((card) =>
             card.id === cardData.id
-              ? { ...cardData, isTracking: card.isTracking }
+              ? {
+                  ...cardData,
+                  isTracking: card.isTracking,
+                  lastTrackingStart: card.lastTrackingStart,
+                  currentElapsedTime: card.currentElapsedTime,
+                  timeSpent: card.timeSpent
+                }
               : card
           ),
         }));

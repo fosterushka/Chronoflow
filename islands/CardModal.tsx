@@ -1,6 +1,7 @@
 import { JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import GitHubTab from "./GitHubTab.tsx";
+import ContextTab from "../components/ContextTab.tsx";
 
 import {
   Card,
@@ -22,7 +23,9 @@ export default function CardModal(
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState("");
   const [checklistRef, setChecklistRef] = useState<HTMLDivElement | null>(null);
-  const [activeTab, setActiveTab] = useState<"task" | "github">("task");
+  const [activeTab, setActiveTab] = useState<"task" | "context" | "github">(
+    "task",
+  );
   const [isShaking, setIsShaking] = useState(false);
   const [isPinging, setIsPinging] = useState(false);
   const [githubData, setGithubData] = useState<GitHubData>({
@@ -30,6 +33,8 @@ export default function CardModal(
     assignees: [],
     cachedContributors: [],
   });
+  const [meetings, setMeetings] = useState([]);
+  const [relatedItems, setRelatedItems] = useState([]);
 
   const resetForm = () => {
     setTitle("");
@@ -45,6 +50,8 @@ export default function CardModal(
       assignees: [],
       cachedContributors: [],
     });
+    setMeetings([]);
+    setRelatedItems([]);
   };
 
   useEffect(() => {
@@ -53,28 +60,29 @@ export default function CardModal(
       return;
     }
 
-    if (mode === "edit" && card) {
-      setTitle(card.title);
-      setDescription(card.description);
-      setSelectedLabels(card.labels);
+    if (card) {
+      setTitle(card.title || "");
+      setDescription(card.description || "");
+      setSelectedLabels(card.labels || []);
       setDueDate(card.dueDate || "");
-      if (card.estimatedTime) {
-        setEstimatedHours(Math.floor(card.estimatedTime / 60).toString());
-        setEstimatedMinutes((card.estimatedTime % 60).toString());
-      } else {
-        setEstimatedHours("");
-        setEstimatedMinutes("");
-      }
       setChecklist(card.checklist || []);
+      setMeetings(card.meetings || []);
+      setRelatedItems(card.relatedItems || []);
+      setGithubData(card.github || {
+        repo: "",
+        assignees: [],
+        cachedContributors: [],
+      });
 
-      // Set GitHub data from card
-      if (card.github) {
-        setGithubData(card.github);
+      if (card.estimatedTime) {
+        const hours = Math.floor(card.estimatedTime / 60);
+        const minutes = card.estimatedTime % 60;
+        setEstimatedHours(hours.toString());
+        setEstimatedMinutes(minutes.toString());
       }
     }
-  }, [isOpen, card, mode]);
+  }, [isOpen, card]);
 
-  //TODO: move all hooks and fucntion to hooks.js and services or store.
   useEffect(() => {
     // Scroll to the bottom of checklist when new item is added
     if (checklistRef) {
@@ -123,24 +131,26 @@ export default function CardModal(
 
   const handleSubmit = (e: JSX.TargetedEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const estimatedTime = estimatedHours || estimatedMinutes
-      ? (parseInt(estimatedHours || "0") * 60) +
-        parseInt(estimatedMinutes || "0")
+      ? parseInt(estimatedHours || "0") * 60 + parseInt(estimatedMinutes || "0")
       : undefined;
 
-    const newCard: Card = {
-      ...(mode === "edit" && card ? card : {}),
+    const updatedCard: Card = {
+      ...(card?.id ? { id: card.id } : {}),
       title,
       description,
       labels: selectedLabels,
       dueDate: dueDate || undefined,
       estimatedTime,
+      timeSpent: card?.timeSpent || 0,
       checklist,
-      github: githubData.repo ? githubData : undefined,
+      meetings,
+      relatedItems,
+      ...(githubData.repo ? { github: githubData } : {}),
     };
 
-    onSubmit(newCard);
-    resetForm();
+    onSubmit(updatedCard);
     onClose();
   };
 
@@ -225,6 +235,17 @@ export default function CardModal(
                 }`}
               >
                 Task
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("context")}
+                class={`py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === "context"
+                    ? "border-blue-500 text-blue-500"
+                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+              >
+                Context
               </button>
               <button
                 type="button"
@@ -355,6 +376,15 @@ export default function CardModal(
                       </div>
                     </div>
                   </div>
+                )
+                : activeTab === "context"
+                ? (
+                  <ContextTab
+                    meetings={meetings}
+                    relatedItems={relatedItems}
+                    onMeetingsChange={setMeetings}
+                    onRelatedItemsChange={setRelatedItems}
+                  />
                 )
                 : (
                   <GitHubTab
