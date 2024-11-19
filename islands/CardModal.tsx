@@ -68,11 +68,13 @@ export default function CardModal(
       setChecklist(card.checklist || []);
       setMeetings(card.meetings || []);
       setRelatedItems(card.relatedItems || []);
-      setGithubData(card.github || {
-        repo: "",
-        assignees: [],
-        cachedContributors: [],
-      });
+      setGithubData(
+        card.github || {
+          repo: "",
+          assignees: [],
+          cachedContributors: [],
+        },
+      );
 
       if (card.estimatedTime) {
         const hours = Math.floor(card.estimatedTime / 60);

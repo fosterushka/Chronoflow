@@ -8,9 +8,11 @@ import * as $index from "./routes/index.tsx";
 import * as $Board from "./islands/Board.tsx";
 import * as $CardModal from "./islands/CardModal.tsx";
 import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
+import * as $ColumnBoard from "./islands/ColumnBoard.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
 import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
 import * as $GitHubTab from "./islands/GitHubTab.tsx";
+import * as $Header from "./islands/Header.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
 import * as $WelcomeModal from "./islands/WelcomeModal.tsx";
@@ -26,9 +28,11 @@ const manifest = {
     "./islands/Board.tsx": $Board,
     "./islands/CardModal.tsx": $CardModal,
     "./islands/ChangelogModal.tsx": $ChangelogModal,
+    "./islands/ColumnBoard.tsx": $ColumnBoard,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
     "./islands/DeleteCardModal.tsx": $DeleteCardModal,
     "./islands/GitHubTab.tsx": $GitHubTab,
+    "./islands/Header.tsx": $Header,
     "./islands/HeaderControls.tsx": $HeaderControls,
     "./islands/Statistics.tsx": $Statistics,
     "./islands/WelcomeModal.tsx": $WelcomeModal,

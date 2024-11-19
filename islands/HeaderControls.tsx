@@ -208,7 +208,7 @@ export default function HeaderControls() {
         </>
       )}
 
-      <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+      <div class="hidden xl:flex text-sm text-gray-600 dark:text-gray-400 items-center gap-2">
         <span>Time is {formatedNowTime}</span>
       </div>
 
@@ -291,10 +291,6 @@ export default function HeaderControls() {
       <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
 
       <div class="relative group flex items-center gap-2">
-        {userName && (
-          <div id="greeting-container" class="text-gray-900 dark:text-white">
-          </div>
-        )}
         <button
           onClick={() => setIsChangelogOpen(true)}
           class="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"

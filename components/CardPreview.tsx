@@ -110,13 +110,6 @@ export default function CardPreview({
           <h3 class="font-medium text-gray-900 dark:text-gray-100 truncate">
             {card.title}
           </h3>
-
-          {/* Description */}
-          {card.description && (
-            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 break-words">
-              {card.description}
-            </p>
-          )}
         </div>
 
         {/* Checklist */}
@@ -242,7 +235,7 @@ export default function CardPreview({
               {isButtonVisible && (
                 <button
                   onClick={onTrackingToggle}
-                  class={`opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-1 rounded text-xs font-medium ${
+                  class={`opacity-20 group-hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-1 rounded text-xs font-medium ${
                     card.isTracking
                       ? "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                       : "text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"

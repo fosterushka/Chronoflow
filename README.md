@@ -1,130 +1,90 @@
-# Chronoflow
+# Chronoflow 🚀
 
-A modern task management application designed for development teams, featuring
-advanced time tracking and workflow optimization.
+I start this project with the goal of creating a tool for myself. But it turned
+out to be a lot more than that.
 
-Actually i build this app for my own personal use, but i hope it can be useful
-for you too. Cuz trello alike is not enough for me. I am planning to monetize
-this app. But it will always have free tier. If you like this app, please
-consider supporting me.
+A task management application designed for development teams, featuring advanced
+time tracking, Git integration, and workflow optimization.
 
-## 🎯 Features
+## ✨ Key Features
 
-### Board Management
+### 🎯 Task Management
 
-- ✨ Five-stage workflow columns: Todo → In Progress → Code Review → Testing →
-  Done
-- 🔄 Drag-and-drop task movement between columns
-- 📊 Real-time task count per column
-- 🎯 Column-specific restrictions (e.g., no tracking in Done column)
+- Five-stage workflow: Todo → In Progress → Code Review → Testing → Done
+- Drag-and-drop task movement
+- Real-time task count and statistics
+- Checklists and subtasks
+- File attachments and organization
 
-### Task Management
+### ⏱️ Time Tracking
 
-- ➕ Create tasks with title, description, and labels
-- 📝 Edit existing tasks
-- 🗑️ Delete tasks with confirmation modal
-- 🏷️ Development-focused labels:
-  - Bug
-  - Feature
-  - Enhancement
-  - Documentation
-  - Design
-  - Refactor
+- Real-time tracking with visual indicators
+- Estimated vs actual time comparison
+- Automatic time logging
+- Progress visualization
+- Time-based analytics
 
-### ⏱️ Advanced Time Tracking
+### 🐙 Git Integration
 
-- 🔄 Track one task at a time
-- ⚡ Real-time time tracking
-- 🎯 Set estimated completion time
-- 🚦 Visual time indicators:
-  - 🟡 Yellow background at 50% of estimated time
-  - 🔴 Red background when time exceeded
-  - 🎨 Smooth color transitions
-  - 💫 Clear visual feedback
+- Repository linking and issue creation
+- Contributor management
+- Assignee selection
+- Pull request tracking
+- Issue templates
 
-### 💾 Data Management
+### 🎥 Meeting Management
 
-- 💾 Automatic saving to localStorage
-- 📤 Export board data to JSON
-- 📥 Import board from JSON
-- 🔄 Real-time state synchronization
-- 🧹 Clear all data option
+- Integration with Zoom, Teams, and Google Meet
+- Meeting scheduling and tracking
+- Notes and documentation
+- Calendar integration
 
-### 🎨 User Interface
+### 🏷️ Organization
 
-- 🌓 Dark/Light mode support with system detection
-- 📱 Responsive design
-- 🎯 Minimalistic and clean interface
-- 📊 Collapsible sidebar with:
-  - Current tracking status
-  - Board statistics
-  - Quick actions
-- ✨ Custom thin scrollbars
-- 🎨 Eye-friendly color scheme
-- 🔄 Smooth transitions
+- Custom labels and categories
+- File management system
+- Task templates
+- Advanced filtering
 
-### 📊 Statistics
+### 📊 Analytics & Reports
 
-- 📈 Total tasks counter
-- ✅ Completed tasks tracker
-- ⏱️ Total estimated time
-- ⌛ Total time spent
+- Time tracking analytics
+- Task completion metrics
+- Progress visualization
+- Performance insights
 
-## 🔜 Roadmap
+## 🚀 Getting Started
 
-- 👤 User authentication
-- 🗄️ Database support
-- 🔍 Advanced filtering
-- 📊 Detailed time reporting
-- 📱 Offline support
-- 💾 Server-side storage
-- 🖥️ Desktop app
+1. Clone the repository
+2. Install dependencies: `deno task install`
+3. Start the development server: `deno task start`
+4. Open [http://localhost:8000](http://localhost:8000)
+
+## 📝 Documentation
+
+- [Changelog](CHANGELOG.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## 🐛 Known Limitations
 
-- 📱 Local storage only
-- 🔒 No user authentication
-- 💾 Limited to browser storage capacity
-- 🌐 No offline support
+- Local storage only (server-side storage coming soon)
+- No user authentication (planned for next release)
+- Limited offline support
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our
+[Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct
+and the process for submitting pull requests.
 
-## 📝 Release Notes
+## 📄 License
 
-### v0.0.4 (2024-01-24)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.
 
-#### 🚀 GitHub Integration
+## 🙏 Acknowledgments
 
-- Improved GitHub integration
-- Added caching and memoization on some part of app
-- Streamlined data structure for better performance
-- Added loading indicators
-
-### v0.0.3
-
-    - Converted sidebar to sticky header for better space utilization
-    - Enhanced time tracking visualization with dynamic indicators and colors
-    - Made modal layout more compact and responsive
-    - Fixed modal state persistence issues
-    - Improved time input fields with better validation
-
-### v0.0.2
-
-- 🎨 Improved UI layout and consistency
-- 🔢 Added version display with changelog popup
-
-### v0.0.1
-
-- Initial release of Chronoflow
-- Advanced time tracking with visual indicators
-- Five-stage workflow management
-- Dark/Light mode support
-- Real-time state synchronization
-- Import/Export functionality
-- Eye-friendly design
-
----
-
-Built with ❤️ using Deno Fresh and Preact by Fosterushka
+- Built with [Fresh](https://fresh.deno.dev/)
+- UI powered by [Tailwind CSS](https://tailwindcss.com/)
+- Icons from [Heroicons](https://heroicons.com/)
