@@ -14,7 +14,6 @@ import type { Card, Column, DraggedCard, EditingCard } from "../types/index.ts";
 import { TaskStateTypes } from "../types/TaskStateTypes.ts";
 import { currentTime, getElapsedTime } from "../signals/timeSignals.ts";
 import { getBoardStatistics } from "../services/boardService.ts";
-import { Header } from "./Header.tsx";
 
 export default function Board() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -355,8 +354,6 @@ export default function Board() {
 
   return (
     <div class="h-screen flex flex-col">
-      <Header stats={stats}></Header>
-
       <div class="flex-1 p-6 bg-gray-100/50 dark:bg-gray-900 min-h-0 overflow-x-auto">
         <div class="flex gap-4 h-full min-w-full">
           {columns.map((column) => (

@@ -2,6 +2,7 @@ import DarkModeToggle from "./DarkModeToggle.tsx";
 import HeaderControls from "./HeaderControls.tsx";
 import { useState } from "preact/hooks";
 
+//TODO: broken stats
 export function Header({ stats }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -41,18 +42,19 @@ export function Header({ stats }) {
                         <div class="flex items-center gap-1.5">
                             <div class="w-1.5 h-1.5 rounded-full bg-indigo-500">
                             </div>
-                            <span>{stats.totalTasks} tasks</span>
+                            <span>{stats?.totalTasks} tasks</span>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500">
                             </div>
-                            <span>{stats.completedTasks} completed</span>
+                            <span>{stats?.completedTasks} completed</span>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <div class="w-1.5 h-1.5 rounded-full bg-blue-500">
                             </div>
                             <span>
-                                {Math.floor(stats.totalTimeSpent / 3600)}h spent
+                                {Math.floor(stats?.totalTimeSpent / 3600)}h
+                                spent
                             </span>
                         </div>
                     </div>
