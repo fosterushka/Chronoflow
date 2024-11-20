@@ -1,4 +1,5 @@
 import type { Column, Label } from "../types/index.ts";
+import { columnsSignal } from "../signals/boardSignals.ts";
 
 export const BOARD_UPDATE_EVENT = "board-update";
 
@@ -88,6 +89,7 @@ export function importData(
           JSON.stringify(processedData),
         );
         setColumns(processedData);
+        columnsSignal.value = processedData;
         dispatchBoardUpdate(processedData);
       } else {
         alert("Invalid file format");

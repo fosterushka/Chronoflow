@@ -1,11 +1,11 @@
 import { JSX } from "preact";
 import { useState } from "preact/hooks";
-import type { Meeting, RelatedItem } from "../types/ICardModal.ts";
+import type { Meeting, RelatedItem } from "../core/types/ICardModal.ts";
 import {
     formatFileSize,
     getMeetingPlatform,
     validateUrl,
-} from "../utils/contextUtils.ts";
+} from "../core/utils/contextUtils.ts";
 import { UrlInput } from "./ui/UrlInput.tsx";
 
 interface ContextTabProps {

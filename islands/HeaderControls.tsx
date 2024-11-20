@@ -1,15 +1,15 @@
 import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
-import { clearStorage, exportData, importData } from "../utils/boardUtils.ts";
-import type { Card, Column } from "../types/index.ts";
-import ChangelogModal from "./ChangelogModal.tsx";
-import WelcomeModal from "./WelcomeModal.tsx";
-import { changelog } from "./ChangelogModal.tsx";
 import {
-  currentTime,
-  formattedTime,
-  getElapsedTime,
-} from "../signals/timeSignals.ts";
+  clearStorage,
+  exportData,
+  importData,
+} from "../core/utils/boardUtils.ts";
+import type { Card, Column } from "../core/types/index.ts";
+import ChangelogModal from "./modals/ChangelogModal.tsx";
+import WelcomeModal from "./modals/WelcomeModal.tsx";
+import { changelog } from "./modals/ChangelogModal.tsx";
+import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
 
 export default function HeaderControls() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -121,6 +121,9 @@ export default function HeaderControls() {
   //TODO: bug if you move to done or todo still tracking time
   const getTrackedTask = () => {
     for (const column of columns) {
+      // Don't show tracking for done or todo columns
+      if (column.id === "done" || column.id === "todo") continue;
+
       const trackedCard = column.cards.find((card) => card.isTracking);
       if (trackedCard) {
         return {
@@ -199,7 +202,7 @@ export default function HeaderControls() {
               }`}
             >
               {formatTime(
-                trackedTask.card.timeSpent +
+                (trackedTask.card.timeSpent || 0) +
                   getElapsedTime(trackedTask.card.lastTrackingStart || 0),
               )}
             </span>
@@ -209,7 +212,7 @@ export default function HeaderControls() {
       )}
 
       <div class="hidden xl:flex text-sm text-gray-600 dark:text-gray-400 items-center gap-2">
-        <span>Time is {formatedNowTime}</span>
+        <span>{formatedNowTime}</span>
       </div>
 
       <div class="relative group">

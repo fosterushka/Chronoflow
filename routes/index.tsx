@@ -1,7 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import Board from "../islands/Board.tsx";
 import { Header } from "../islands/Header.tsx";
-import { getBoardStatistics } from "../services/boardService.ts";
 
 export default function Home() {
   return (

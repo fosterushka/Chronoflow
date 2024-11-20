@@ -38,27 +38,6 @@ export function Header({ stats }) {
 
                 {/* Desktop Menu */}
                 <div class="hidden sm:flex items-center gap-4">
-                    <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-1.5 h-1.5 rounded-full bg-indigo-500">
-                            </div>
-                            <span>{stats?.totalTasks} tasks</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500">
-                            </div>
-                            <span>{stats?.completedTasks} completed</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500">
-                            </div>
-                            <span>
-                                {Math.floor(stats?.totalTimeSpent / 3600)}h
-                                spent
-                            </span>
-                        </div>
-                    </div>
-
                     <div class="flex items-center gap-2">
                         <HeaderControls />
                         <DarkModeToggle />
@@ -126,38 +105,6 @@ export function Header({ stats }) {
                         </div>
                         <div class="flex-1 overflow-y-auto p-4">
                             <div class="space-y-6">
-                                {/* Stats */}
-                                <div class="space-y-4">
-                                    <h2 class="text-sm font-medium text-gray-900 dark:text-white">
-                                        Statistics
-                                    </h2>
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-2 h-2 rounded-full bg-indigo-500">
-                                            </div>
-                                            <span class="text-sm text-gray-600 dark:text-gray-300">
-                                                {stats.totalTasks} tasks
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-2 h-2 rounded-full bg-emerald-500">
-                                            </div>
-                                            <span class="text-sm text-gray-600 dark:text-gray-300">
-                                                {stats.completedTasks} completed
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-2 h-2 rounded-full bg-blue-500">
-                                            </div>
-                                            <span class="text-sm text-gray-600 dark:text-gray-300">
-                                                {Math.floor(
-                                                    stats.totalTimeSpent / 3600,
-                                                )}h spent
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 {/* Controls */}
                                 <div class="space-y-4">
                                     <h2 class="text-sm font-medium text-gray-900 dark:text-white">

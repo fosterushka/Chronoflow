@@ -1,6 +1,8 @@
 import { Card, Column } from "../types/index.ts";
 import { TaskStateTypes } from "../types/TaskStateTypes.ts";
 import { getElapsedTime } from "../signals/timeSignals.ts";
+import { columnsSignal, updateCardTracking } from "../signals/boardSignals.ts";
+import { dispatchBoardUpdate } from "../utils/boardUtils.ts";
 
 export const formatTime = (seconds: number = 0) => {
   const hours = Math.floor(seconds / 3600);
@@ -22,32 +24,6 @@ export const isHalfwayThroughEstimatedTime = (card: Card) => {
   return card.timeSpent >= halfTime && card.timeSpent <= estimatedTimeInSeconds;
 };
 
-export const getTimeBasedBorderColor = (card: Card) => {
-  if (card.isTracking) {
-    const estimatedTimeInSeconds = card.estimatedTime
-      ? card.estimatedTime * 60
-      : 0;
-    const currentElapsedTime = getElapsedTime(card.lastTrackingStart || 0);
-    const totalTime = card.timeSpent + currentElapsedTime;
-
-    if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
-      return "border border-red-200 dark:border-red-800";
-    }
-    if (estimatedTimeInSeconds && totalTime >= estimatedTimeInSeconds / 2) {
-      return "border border-amber-200 dark:border-amber-800";
-    }
-    return "border border-emerald-200 dark:border-emerald-800";
-  }
-
-  if (hasExceededEstimatedTime(card)) {
-    return "border border-red-100 dark:border-red-900/30";
-  }
-  if (isHalfwayThroughEstimatedTime(card)) {
-    return "border border-amber-100 dark:border-amber-900/30";
-  }
-  return "border border-gray-200 dark:border-gray-700";
-};
-
 export const getTimeBasedColor = (card: Card) => {
   if (card.isTracking) {
     const estimatedTimeInSeconds = card.estimatedTime
@@ -57,29 +33,21 @@ export const getTimeBasedColor = (card: Card) => {
     const totalTime = card.timeSpent + currentElapsedTime;
 
     if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
-      return `bg-red-100/90 dark:bg-red-900/90 ${
-        getTimeBasedBorderColor(card)
-      }`;
+      return `bg-red-100/90 dark:bg-red-900/90`;
     }
     if (estimatedTimeInSeconds && totalTime >= estimatedTimeInSeconds / 2) {
-      return `bg-amber-100/90 dark:bg-amber-900/90 ${
-        getTimeBasedBorderColor(card)
-      }`;
+      return `bg-amber-100/90 dark:bg-amber-900/90`;
     }
-    return `bg-emerald-100/90 dark:bg-emerald-900/90 ${
-      getTimeBasedBorderColor(card)
-    }`;
+    return `bg-emerald-100/90 dark:bg-emerald-900/90`;
   }
 
   if (hasExceededEstimatedTime(card)) {
-    return `bg-red-50/90 dark:bg-red-900/20 ${getTimeBasedBorderColor(card)}`;
+    return `bg-red-50/90 dark:bg-red-900/20`;
   }
   if (isHalfwayThroughEstimatedTime(card)) {
-    return `bg-amber-50/90 dark:bg-amber-900/20 ${
-      getTimeBasedBorderColor(card)
-    }`;
+    return `bg-amber-50/90 dark:bg-amber-900/20`;
   }
-  return `bg-white/90 dark:bg-gray-800/90 ${getTimeBasedBorderColor(card)}`;
+  return `bg-white/90 dark:bg-gray-800/90`;
 };
 
 export const getBoardStatistics = (columns: Column[]) => {
@@ -106,4 +74,30 @@ export const getBoardStatistics = (columns: Column[]) => {
     totalEstimatedTime: totalEstimatedTime || 0,
     totalTimeSpent: totalTimeSpent || 0,
   };
+};
+
+export const syncWithLocalStorage = () => {
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(
+      "chronoflowColumns",
+      JSON.stringify(columnsSignal.value),
+    );
+    dispatchBoardUpdate(columnsSignal.value);
+  }
+};
+
+export const handleCardTracking = (columnId: string, cardId: string) => {
+  const column = columnsSignal.value.find((col) => col.id === columnId);
+  const card = column?.cards.find((c) => c.id === cardId);
+
+  if (!card) return;
+
+  const isTracking = !card.isTracking;
+  updateCardTracking(columnId, cardId, isTracking);
+  syncWithLocalStorage();
+};
+
+export const shouldStopTracking = (targetColumnId: string, card: Card) => {
+  return (targetColumnId === TaskStateTypes.TODO ||
+    targetColumnId === TaskStateTypes.DONE) && card.isTracking;
 };

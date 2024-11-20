@@ -6,16 +6,21 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $Board from "./islands/Board.tsx";
-import * as $CardModal from "./islands/CardModal.tsx";
-import * as $ChangelogModal from "./islands/ChangelogModal.tsx";
+import * as $CardPreview from "./islands/CardPreview.tsx";
 import * as $ColumnBoard from "./islands/ColumnBoard.tsx";
+import * as $ContextTab from "./islands/ContextTab.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
-import * as $DeleteCardModal from "./islands/DeleteCardModal.tsx";
 import * as $GitHubTab from "./islands/GitHubTab.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
-import * as $WelcomeModal from "./islands/WelcomeModal.tsx";
+import * as $hooks_useBoardState from "./core/hooks/useBoardState.ts";
+import * as $modals_CardModal from "./islands/modals/CardModal.tsx";
+import * as $modals_ChangelogModal from "./islands/modals/ChangelogModal.tsx";
+import * as $modals_DeleteCardModal from "./islands/modals/DeleteCardModal.tsx";
+import * as $modals_MobileWarningModal from "./islands/modals/MobileWarningModal.tsx";
+import * as $modals_WelcomeModal from "./islands/modals/WelcomeModal.tsx";
+import * as $ui_UrlInput from "./islands/ui/UrlInput.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -26,16 +31,21 @@ const manifest = {
   },
   islands: {
     "./islands/Board.tsx": $Board,
-    "./islands/CardModal.tsx": $CardModal,
-    "./islands/ChangelogModal.tsx": $ChangelogModal,
+    "./islands/CardPreview.tsx": $CardPreview,
     "./islands/ColumnBoard.tsx": $ColumnBoard,
+    "./islands/ContextTab.tsx": $ContextTab,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
-    "./islands/DeleteCardModal.tsx": $DeleteCardModal,
     "./islands/GitHubTab.tsx": $GitHubTab,
     "./islands/Header.tsx": $Header,
     "./islands/HeaderControls.tsx": $HeaderControls,
     "./islands/Statistics.tsx": $Statistics,
-    "./islands/WelcomeModal.tsx": $WelcomeModal,
+    "./core/hooks/useBoardState.ts": $hooks_useBoardState,
+    "./islands/modals/CardModal.tsx": $modals_CardModal,
+    "./islands/modals/ChangelogModal.tsx": $modals_ChangelogModal,
+    "./islands/modals/DeleteCardModal.tsx": $modals_DeleteCardModal,
+    "./islands/modals/MobileWarningModal.tsx": $modals_MobileWarningModal,
+    "./islands/modals/WelcomeModal.tsx": $modals_WelcomeModal,
+    "./islands/ui/UrlInput.tsx": $ui_UrlInput,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

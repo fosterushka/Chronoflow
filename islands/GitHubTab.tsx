@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import type { GitHubContributor, GitHubData } from "../types/index.ts";
+import type { GitHubContributor, GitHubData } from "../core/types/index.ts";
 
 interface GitHubTabProps {
   description: string;
@@ -45,26 +45,29 @@ export default function GitHubTab({
 
   // Filter contributors based on search query
   const filteredContributors = contributors.filter(
-    (contributor) => contributor.login.toLowerCase().includes(searchQuery.toLowerCase())
+    (contributor) =>
+      contributor.login.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && 
-          !dropdownRef.current.contains(event.target as Node) && 
-          dropdownMenuRef.current && 
-          !dropdownMenuRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        dropdownMenuRef.current &&
+        !dropdownMenuRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
     if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
 
@@ -95,13 +98,21 @@ export default function GitHubTab({
         if (!owner || !repo) throw new Error("Invalid repository URL");
 
         // Check if repo exists
-        const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+        const repoResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}`,
+        );
         if (!repoResponse.ok) {
-          throw new Error(repoResponse.status === 404 ? "Repository not found" : "Failed to validate repository");
+          throw new Error(
+            repoResponse.status === 404
+              ? "Repository not found"
+              : "Failed to validate repository",
+          );
         }
 
         // Fetch contributors
-        const contributorsResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contributors`);
+        const contributorsResponse = await fetch(
+          `https://api.github.com/repos/${owner}/${repo}/contributors`,
+        );
         if (!contributorsResponse.ok) {
           throw new Error("Failed to fetch contributors");
         }
@@ -134,7 +145,7 @@ export default function GitHubTab({
   // Handle assignee selection
   const toggleAssignee = (login: string) => {
     const newAssignees = githubAssignees.includes(login)
-      ? githubAssignees.filter(a => a !== login)
+      ? githubAssignees.filter((a) => a !== login)
       : [...githubAssignees, login];
 
     setGithubAssignees(newAssignees);
@@ -161,7 +172,7 @@ export default function GitHubTab({
 
     if (checklist?.length) {
       const checklistMd = checklist
-        .map(item => `- [${item.isChecked ? "x" : " "}] ${item.text}`)
+        .map((item) => `- [${item.isChecked ? "x" : " "}] ${item.text}`)
         .join("\n");
       params.set("body", `${description}\n\n### Checklist\n${checklistMd}`);
     }
@@ -191,9 +202,25 @@ export default function GitHubTab({
         />
         {isLoading && (
           <div class="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg class="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg
+              class="animate-spin h-4 w-4 text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              />
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
           </div>
         )}
@@ -204,31 +231,35 @@ export default function GitHubTab({
         <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
           Assignees
         </div>
-        
+
         {/* Dropdown Trigger Button */}
         <button
           type="button"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           disabled={!githubRepo || contributors.length === 0}
           class={`w-full text-left text-sm bg-white/50 dark:bg-gray-700/50 border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed ${
-            !githubRepo || contributors.length === 0 ? "bg-gray-100 dark:bg-gray-800" : ""
+            !githubRepo || contributors.length === 0
+              ? "bg-gray-100 dark:bg-gray-800"
+              : ""
           }`}
         >
           {githubAssignees.length > 0
-            ? `${githubAssignees.length} assignee${githubAssignees.length > 1 ? "s" : ""} selected`
+            ? `${githubAssignees.length} assignee${
+              githubAssignees.length > 1 ? "s" : ""
+            } selected`
             : "Select assignees"}
         </button>
       </div>
 
       {/* Dropdown Menu - Rendered at root level */}
       {isDropdownOpen && (
-        <div 
+        <div
           ref={dropdownMenuRef}
-          style={{ 
-            position: 'fixed',
-            width: dropdownRef.current?.getBoundingClientRect().width + 'px',
-            left: dropdownRef.current?.getBoundingClientRect().left + 'px',
-            top: dropdownRef.current?.getBoundingClientRect().bottom + 4 + 'px',
+          style={{
+            position: "fixed",
+            width: dropdownRef.current?.getBoundingClientRect().width + "px",
+            left: dropdownRef.current?.getBoundingClientRect().left + "px",
+            top: dropdownRef.current?.getBoundingClientRect().bottom + 4 + "px",
           }}
           class="z-[100] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
           onClick={(e) => e.stopPropagation()}
@@ -247,38 +278,54 @@ export default function GitHubTab({
 
           {/* Contributors List */}
           <div class="max-h-64 overflow-y-auto py-1">
-            {filteredContributors.length > 0 ? (
-              filteredContributors.map((contributor) => {
-                const isSelected = githubAssignees.includes(contributor.login);
-                return (
-                  <div
-                    key={contributor.login}
-                    onClick={() => toggleAssignee(contributor.login)}
-                    class={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
-                      isSelected ? "bg-gray-100 dark:bg-gray-700" : ""
-                    }`}
-                  >
-                    <img
-                      src={contributor.avatar_url}
-                      alt={contributor.login}
-                      class="w-6 h-6 rounded-full"
-                    />
-                    <span class="flex-1 text-sm text-gray-700 dark:text-gray-300">
-                      {contributor.login}
-                    </span>
-                    {isSelected && (
-                      <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                {searchQuery ? "No matching contributors" : "No contributors found"}
-              </div>
-            )}
+            {filteredContributors.length > 0
+              ? (
+                filteredContributors.map((contributor) => {
+                  const isSelected = githubAssignees.includes(
+                    contributor.login,
+                  );
+                  return (
+                    <div
+                      key={contributor.login}
+                      onClick={() => toggleAssignee(contributor.login)}
+                      class={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                        isSelected ? "bg-gray-100 dark:bg-gray-700" : ""
+                      }`}
+                    >
+                      <img
+                        src={contributor.avatar_url}
+                        alt={contributor.login}
+                        class="w-6 h-6 rounded-full"
+                      />
+                      <span class="flex-1 text-sm text-gray-700 dark:text-gray-300">
+                        {contributor.login}
+                      </span>
+                      {isSelected && (
+                        <svg
+                          class="w-4 h-4 text-blue-500"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  );
+                })
+              )
+              : (
+                <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                  {searchQuery
+                    ? "No matching contributors"
+                    : "No contributors found"}
+                </div>
+              )}
           </div>
         </div>
       )}
@@ -290,16 +337,35 @@ export default function GitHubTab({
             const contributor = contributors.find((c) => c.login === login);
             return (
               contributor && (
-                <div key={login} class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full pl-1 pr-2 py-1">
-                  <img src={contributor.avatar_url} alt={login} class="w-5 h-5 rounded-full" />
-                  <span class="text-sm text-gray-700 dark:text-gray-300">{login}</span>
+                <div
+                  key={login}
+                  class="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full pl-1 pr-2 py-1"
+                >
+                  <img
+                    src={contributor.avatar_url}
+                    alt={login}
+                    class="w-5 h-5 rounded-full"
+                  />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">
+                    {login}
+                  </span>
                   <button
                     type="button"
                     onClick={() => toggleAssignee(login)}
                     class="text-gray-400 hover:text-red-500"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
