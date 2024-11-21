@@ -30,6 +30,17 @@ export interface RelatedItem {
     fileSize?: number;
 }
 
+export interface AuditEntry {
+    id: string;
+    timestamp: number;
+    type: 'create' | 'update' | 'move' | 'status_change' | 'comment';
+    field?: string;
+    oldValue?: any;
+    newValue?: any;
+    userId?: string;
+    columnId?: string;
+}
+
 export interface Card {
     id?: string;
     title: string;
@@ -38,7 +49,7 @@ export interface Card {
     dueDate?: string;
     estimatedTime?: number;
     timeSpent?: number;
-    checklist: ChecklistItem[];
+    checklist?: ChecklistItem[];
     meetings?: Meeting[];
     relatedItems?: RelatedItem[];
     github?: {
@@ -46,6 +57,11 @@ export interface Card {
         assignees: string[];
         cachedContributors: string[];
     };
+    auditHistory?: AuditEntry[];
+    createdAt?: number;
+    updatedAt?: number;
+    createdBy?: string;
+    lastUpdatedBy?: string;
 }
 
 export interface GitHubData {
@@ -62,3 +78,5 @@ export interface CardModalProps {
     card?: Card | null;
     mode: "add" | "edit";
 }
+
+export type TabType = "task" | "github" | "context" | "audit";

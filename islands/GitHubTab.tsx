@@ -94,18 +94,34 @@ export default function GitHubTab({
 
         // Parse repo URL
         const url = new URL(githubRepo);
-        const [, owner, repo] = url.pathname.split("/");
-        if (!owner || !repo) throw new Error("Invalid repository URL");
+        if (!url.hostname.includes('github.com')) {
+          throw new Error('Please enter a valid GitHub URL');
+        }
+
+        // Extract owner and repo from pathname
+        const parts = url.pathname.split('/').filter(Boolean);
+        if (parts.length < 2) {
+          throw new Error('Please enter a complete repository URL (e.g., https://github.com/owner/repo)');
+        }
+        const [owner, repo] = parts;
 
         // Check if repo exists
         const repoResponse = await fetch(
           `https://api.github.com/repos/${owner}/${repo}`,
+          {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json',
+            }
+          }
         );
+
         if (!repoResponse.ok) {
+          const errorData = await repoResponse.json();
+          console.error('GitHub API Error:', { status: repoResponse.status, data: errorData });
           throw new Error(
             repoResponse.status === 404
-              ? "Repository not found"
-              : "Failed to validate repository",
+              ? `Repository '${owner}/${repo}' not found. Please check the URL.`
+              : errorData.message || 'Failed to validate repository'
           );
         }
 

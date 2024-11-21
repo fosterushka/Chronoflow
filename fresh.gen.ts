@@ -5,6 +5,7 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
+import * as $AuditTab from "./islands/AuditTab.tsx";
 import * as $Board from "./islands/Board.tsx";
 import * as $CardPreview from "./islands/CardPreview.tsx";
 import * as $ColumnBoard from "./islands/ColumnBoard.tsx";
@@ -14,7 +15,6 @@ import * as $GitHubTab from "./islands/GitHubTab.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
-import * as $hooks_useBoardState from "./core/hooks/useBoardState.ts";
 import * as $modals_CardModal from "./islands/modals/CardModal.tsx";
 import * as $modals_ChangelogModal from "./islands/modals/ChangelogModal.tsx";
 import * as $modals_DeleteCardModal from "./islands/modals/DeleteCardModal.tsx";
@@ -30,6 +30,7 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
+    "./islands/AuditTab.tsx": $AuditTab,
     "./islands/Board.tsx": $Board,
     "./islands/CardPreview.tsx": $CardPreview,
     "./islands/ColumnBoard.tsx": $ColumnBoard,
@@ -39,7 +40,6 @@ const manifest = {
     "./islands/Header.tsx": $Header,
     "./islands/HeaderControls.tsx": $HeaderControls,
     "./islands/Statistics.tsx": $Statistics,
-    "./core/hooks/useBoardState.ts": $hooks_useBoardState,
     "./islands/modals/CardModal.tsx": $modals_CardModal,
     "./islands/modals/ChangelogModal.tsx": $modals_ChangelogModal,
     "./islands/modals/DeleteCardModal.tsx": $modals_DeleteCardModal,
