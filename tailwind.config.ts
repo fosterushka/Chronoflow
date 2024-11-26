@@ -1,12 +1,90 @@
 import { type Config } from "tailwindcss";
 
 export default {
+  plugins: [],
   content: [
     "{routes,islands,components}/**/*.{ts,tsx}",
   ],
-  darkMode: 'class',
+  darkMode: "class",
+  safelist: [
+    "bg-red-500",
+    "dark:bg-red-500",
+    "bg-blue-500",
+    "dark:bg-blue-500",
+    "bg-green-500",
+    "dark:bg-green-500",
+    "bg-purple-500",
+    "dark:bg-purple-500",
+    "bg-yellow-500",
+    "dark:bg-yellow-500",
+    "bg-orange-500",
+    "dark:bg-orange-500",
+    "bg-red-100/90",
+    "dark:bg-red-100/90",
+    "bg-red-900/90",
+    "dark:bg-red-900/90",
+    "bg-amber-100/90",
+    "dark:bg-amber-100/90",
+    "bg-amber-900/90",
+    "dark:bg-amber-900/90",
+    "bg-emerald-100/90",
+    "dark:bg-emerald-100/90",
+    "bg-emerald-900/90",
+    "dark:bg-emerald-900/90",
+    "bg-red-50/90",
+    "dark:bg-red-50/90",
+    "bg-red-900/20",
+    "dark:bg-red-900/20",
+    "bg-amber-50/90",
+    "dark:bg-amber-50/90",
+    "bg-amber-900/20",
+    "dark:bg-amber-900/20",
+    "bg-white/90",
+    "dark:bg-white/90",
+    "bg-gray-800/90",
+    "dark:bg-gray-800/90",
+    // Ring styles for tracking
+    "ring-2",
+    "dark:ring-2",
+    "ring-emerald-500/20",
+    "dark:ring-emerald-500/20",
+    // Border base class
+    "border",
+    // Light mode border colors
+    "border-red-200",
+    "border-amber-200",
+    "border-emerald-200",
+    "border-red-100",
+    "border-amber-100",
+    "border-gray-200",
+    // Dark mode border colors
+    "dark:border-red-800",
+    "dark:border-amber-800",
+    "dark:border-emerald-800",
+    "dark:border-red-900/30",
+    "dark:border-amber-900/30",
+    "dark:border-gray-700",
+    "dark:border-red-900/30",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-4px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(4px)" },
+        },
+        ping: {
+          "75%, 100%": {
+            transform: "scale(1.5)",
+            opacity: "0",
+          },
+        },
+      },
+      animation: {
+        shake: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
+        "ping-once": "ping 0.5s cubic-bezier(0, 0, 0.2, 1) forwards",
+      },
+    },
   },
-  plugins: [],
 } satisfies Config;
