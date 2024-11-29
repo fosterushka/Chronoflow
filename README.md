@@ -58,13 +58,11 @@ time tracking, Git integration, and workflow optimization.
 1. Clone the repository
 2. Install dependencies: `deno task install`
 3. Start the development server: `deno task start`
-4. Open [http://localhost:8000](http://localhost:8000)
 
 ## 📝 Documentation
 
-- [Changelog](CHANGELOG.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Changelog](./CHANGELOG.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
 
 ## 🐛 Known Limitations
 
@@ -72,16 +70,10 @@ time tracking, Git integration, and workflow optimization.
 - No user authentication (planned for next release)
 - Limited offline support
 
-## 🤝 Contributing
-
-Contributions are welcome! Please read our
-[Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct
-and the process for submitting pull requests.
-
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
-for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE.md)
+file for details.
 
 ## 🙏 Acknowledgments
 

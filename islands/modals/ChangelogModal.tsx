@@ -8,7 +8,7 @@ interface ChangelogModalProps {
 export const changelog = [
   {
     version: "0.0.4",
-    date: "17/11/2024",
+    date: "29/11/2024",
     changes: [
       "Welcoming screen",
       "Added GitHub issue creation",
@@ -44,7 +44,7 @@ export const changelog = [
   },
   {
     version: "0.0.1",
-    date: "15/11/2024",
+    date: "16/11/2024",
     changes: [
       "Initial release",
       "Basic kanban board functionality",
@@ -64,25 +64,26 @@ export default function ChangelogModal(
   return (
     <div class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4 py-8">
-        <div 
-          class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+        <div
+          class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
           onClick={onClose}
-        ></div>
+        >
+        </div>
         <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col transform transition-all duration-300 ease-out animate-fade-scale-up">
           {/* Header */}
           <div class="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center">
-                <svg 
-                  class="w-5 h-5 text-blue-500 dark:text-blue-400" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  class="w-5 h-5 text-blue-500 dark:text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round" 
-                    stroke-width="2" 
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                   />
                 </svg>
@@ -126,9 +127,9 @@ export default function ChangelogModal(
                   <div class="flex gap-6">
                     {/* Version Dot */}
                     <div class="relative z-10 w-6 h-6 rounded-full bg-blue-500 dark:bg-blue-400 flex items-center justify-center ring-8 ring-white dark:ring-gray-800 transition-transform duration-200 hover:scale-110">
-                      <svg 
-                        class="w-3 h-3 text-white" 
-                        fill="currentColor" 
+                      <svg
+                        class="w-3 h-3 text-white"
+                        fill="currentColor"
                         viewBox="0 0 16 16"
                       >
                         <circle cx="8" cy="8" r="3" />
@@ -147,21 +148,21 @@ export default function ChangelogModal(
                       </div>
                       <ul class="space-y-2">
                         {release.changes.map((change, index) => (
-                          <li 
+                          <li
                             key={index}
                             class="flex items-start gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
                           >
-                            <svg 
-                              class="w-5 h-5 mt-0.5 flex-shrink-0 text-blue-500 dark:text-blue-400" 
-                              fill="none" 
-                              stroke="currentColor" 
+                            <svg
+                              class="w-5 h-5 mt-0.5 flex-shrink-0 text-blue-500 dark:text-blue-400"
+                              fill="none"
+                              stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
-                              <path 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round" 
-                                stroke-width="2" 
-                                d="M9 12l2 2 4-4" 
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4"
                               />
                             </svg>
                             <span>{change}</span>

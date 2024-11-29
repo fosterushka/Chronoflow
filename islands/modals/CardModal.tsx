@@ -13,7 +13,7 @@ import {
   TabType,
 } from "../../core/types/ICardModal.ts";
 
-// First, let's move the ChecklistItem interface outside the component
+//TODO: First, let's move the ChecklistItem interface outside the component
 interface ChecklistItem {
   id: string;
   text: string;
@@ -58,7 +58,7 @@ export default function CardModal({
   const [newChecklistItem, setNewChecklistItem] = useState<string>("");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
-  // Memoize computed values
+  //TODO: Memoize computed values
   const estimatedTime: EstimatedTime = useMemo(() => {
     return {
       hours: parseInt(estimatedHours) || 0,
@@ -73,7 +73,7 @@ export default function CardModal({
     return date.toISOString();
   }, [dueDate]);
 
-  // Optimized handlers with useCallback
+  //TODO: Optimized handlers with useCallback
   const handleTitleChange = useCallback(
     (e: JSX.TargetedEvent<HTMLInputElement>): void => {
       setTitle(e.currentTarget.value);
@@ -128,7 +128,7 @@ export default function CardModal({
     );
   }, []);
 
-  // Reset form with proper typing
+  //TODO: Reset form with proper typing
   const resetForm = useCallback((): void => {
     setTitle("");
     setDescription("");
@@ -204,7 +204,7 @@ export default function CardModal({
       auditHistory: [...(card?.auditHistory || [])],
     };
 
-    // Add audit entries for changes
+    //TODO: Add audit entries for changes
     if (mode === "add") {
       updatedCard.auditHistory.push(createAuditEntry("create"));
     } else if (card) {
