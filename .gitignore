@@ -9,3 +9,8 @@
 _fresh/
 # npm dependencies
 node_modules/
+docs/
+
+.DS_Store
+*.db
+.aider*
