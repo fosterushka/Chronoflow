@@ -15,20 +15,17 @@ export interface Meeting {
     platform: "zoom" | "google" | "teams" | "other";
     url: string;
     title: string;
-    scheduledFor?: string;
-    duration?: number;
-}
-
-export interface RelatedItem {
+  }
+  
+  export interface RelatedItem {
     id: string;
-    type: "task" | "file" | "link";
+    type: "link" | "file";
     title: string;
     url?: string;
-    taskId?: string;
-    fileUrl?: string;
     fileType?: string;
     fileSize?: number;
-}
+    fileUrl?: string;
+  }
 
 export interface AuditEntry {
     id: string;
