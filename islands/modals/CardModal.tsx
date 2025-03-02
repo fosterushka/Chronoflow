@@ -243,6 +243,10 @@ export default function CardModal({
       auditHistory: card?.auditHistory || [],
       createdAt: card?.createdAt || Date.now(),
       updatedAt: Date.now(),
+      isTracking: card?.isTracking || false,
+      lastTrackingStart: card?.lastTrackingStart || 0,
+      timeSpent: card?.timeSpent || 0,
+      currentElapsedTime: card?.currentElapsedTime || 0,
     };
 
     if (mode === "add") {

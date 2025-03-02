@@ -212,7 +212,7 @@ export default function CardPreview({
         {/* Metadata and Progress */}
         <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           {/* Time tracking */}
-          {isButtonVisible && currentElapsedTime.value > 0 && (
+          {currentElapsedTime.value > 0 && (
             <span
               class={`inline-flex items-center gap-1 ${
                 hasExceededEstimatedTime(card)

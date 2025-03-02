@@ -18,6 +18,7 @@ import type { Card, ColumnId, EditingCard } from "../core/types/index.ts";
 import type { DeleteCardState } from "../core/types/board.ts";
 import { ErrorBoundary } from "../components/ErrorBoundary.tsx";
 import type { Card as ModalCard } from "../core/types/ICardModal.ts";
+import { Header } from "./Header.tsx";
 
 export const convertModalCardToBoardCard = (modalCard: ModalCard): Card => {
   return {
@@ -186,6 +187,7 @@ export default function Board() {
         </div>
       )}
     >
+      <Header onCardEdit={handleCardEdit} />
       <div class="h-full flex flex-col">
         <ColumnBoard
           onDragStart={(card, columnId) => {

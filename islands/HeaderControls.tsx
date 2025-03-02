@@ -11,10 +11,14 @@ import WelcomeModal from "./modals/WelcomeModal.tsx";
 import { changelog } from "./modals/ChangelogModal.tsx";
 import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
 import { signal } from "@preact/signals";
+import { IHeaderProps } from "./Header.tsx";
 
 export const experimentalFeaturesEnabled = signal<boolean>(false);
 
-export default function HeaderControls() {
+export default function HeaderControls({
+  _stats = null,
+  onCardEdit,
+}: IHeaderProps) {
   const [columns, setColumns] = useState<Column[]>(() => {
     if (typeof localStorage !== "undefined") {
       const savedData = localStorage.getItem("chronoflowColumns");
@@ -51,11 +55,6 @@ export default function HeaderControls() {
     }
   }, []);
 
-  /**
-   * Handles the completion of the welcome process.
-   * Sets the intro as seen, saves the user's name, updates the state, and closes the welcome modal.
-   * @param {string} name - The name entered by the user
-   */
   const handleWelcomeComplete = (name: string) => {
     localStorage.setItem("chronoflowIntroSeen", "true");
     localStorage.setItem("chronoflowUserName", name);
@@ -63,10 +62,6 @@ export default function HeaderControls() {
     setShowWelcome(false);
   };
 
-  /**
-   * Handles skipping the welcome process.
-   * Sets the intro as seen and closes the welcome modal without saving a name.
-   */
   const handleWelcomeSkip = () => {
     localStorage.setItem("chronoflowIntroSeen", "true");
     setShowWelcome(false);
@@ -126,22 +121,14 @@ export default function HeaderControls() {
     }
   }, [userName]);
 
-  /**
-   * Formats seconds into HH:MM:SS string format
-   * @param seconds - Number of seconds to format
-   * @returns Formatted time string in HH:MM:SS format
-   */
   const formatTime = (seconds: number): string => {
-    // Handle edge cases
     if (seconds < 0) return "00:00:00";
     if (!Number.isFinite(seconds)) return "Invalid input";
 
-    // Calculate hours, minutes, and seconds
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
 
-    // Format with leading zeros
     const parts = [
       hours.toString().padStart(2, "0"),
       minutes.toString().padStart(2, "0"),
@@ -186,7 +173,6 @@ export default function HeaderControls() {
 
   const trackedTask = getTrackedTask();
 
-  // Listen for board updates
   useEffect(() => {
     const handleBoardUpdate = (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -218,7 +204,14 @@ export default function HeaderControls() {
     <div class="flex items-center gap-2">
       {trackedTask && (
         <>
-          <div class="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
+          <div
+            class="flex items-center gap-2 px-3 py-1.5 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/50 dark:border-gray-700/50 cursor-pointer hover:bg-white/80 dark:hover:bg-gray-800/80 transition-colors"
+            onClick={() => {
+              if (onCardEdit) {
+                onCardEdit(trackedTask.card, trackedTask.columnId);
+              }
+            }}
+          >
             <div class="flex items-center gap-2">
               <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse">
               </div>

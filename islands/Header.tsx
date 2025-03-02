@@ -1,8 +1,14 @@
+import { Card } from "../core/types/shared.ts";
 import DarkModeToggle from "./DarkModeToggle.tsx";
 import HeaderControls from "./HeaderControls.tsx";
 import { useState } from "preact/hooks";
 
-export function Header({ _stats = null }) {
+export interface IHeaderProps {
+  _stats?: [] | null;
+  onCardEdit?: (card: Card, columnId: string) => void;
+}
+
+export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -38,7 +44,7 @@ export function Header({ _stats = null }) {
         {/* Desktop Menu */}
         <div class="hidden sm:flex items-center gap-4">
           <div class="flex items-center gap-2">
-            <HeaderControls />
+            <HeaderControls onCardEdit={onCardEdit} />
             <DarkModeToggle />
           </div>
         </div>
@@ -112,7 +118,7 @@ export function Header({ _stats = null }) {
                     Controls
                   </h2>
                   <div class="flex flex-col gap-4">
-                    <HeaderControls />
+                    <HeaderControls onCardEdit={onCardEdit} />
                     <DarkModeToggle />
                   </div>
                 </div>
