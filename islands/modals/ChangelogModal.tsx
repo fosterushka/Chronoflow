@@ -58,8 +58,8 @@ export const changelog = [
 
 export default function ChangelogModal(
   { isOpen, onClose }: ChangelogModalProps,
-): JSX.Element {
-  if (!isOpen) return <></>;
+): JSX.Element | null {
+  if (!isOpen) return null;
 
   return (
     <div class="fixed inset-0 z-50 overflow-y-auto">
@@ -93,6 +93,7 @@ export default function ChangelogModal(
               </h2>
             </div>
             <button
+              type="button"
               onClick={onClose}
               class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
@@ -180,15 +181,3 @@ export default function ChangelogModal(
     </div>
   );
 }
-
-// Add this animation to your global CSS or tailwind config if not already added
-/*
-@keyframes fade-scale-up {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-fade-scale-up {
-  animation: fade-scale-up 0.3s ease-out forwards;
-}
-*/

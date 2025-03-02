@@ -1,5 +1,6 @@
 import type { Column, Label } from "../types/index.ts";
 import { columnsSignal } from "../signals/boardSignals.ts";
+import { Card } from "../types/ICardModal.ts";
 
 export const BOARD_UPDATE_EVENT = "board-update";
 
@@ -69,7 +70,7 @@ export function importData(
         Array.isArray(data) &&
         data.every((col) =>
           col.id && col.title && Array.isArray(col.cards) &&
-          col.cards.every((card: any) => card.id && card.title)
+          col.cards.every((card: Card) => card.id && card.title)
         )
       ) {
         // Initialize timeSpent and other missing properties
@@ -79,7 +80,7 @@ export function importData(
             ...card,
             timeSpent: card.timeSpent || 0,
             isTracking: false,
-            lastTrackingStart: undefined,
+            lastTrackingStart: Date.now(),
             currentElapsedTime: 0,
           })),
         }));

@@ -10,6 +10,9 @@ import ChangelogModal from "./modals/ChangelogModal.tsx";
 import WelcomeModal from "./modals/WelcomeModal.tsx";
 import { changelog } from "./modals/ChangelogModal.tsx";
 import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
+import { signal } from "@preact/signals";
+
+export const experimentalFeaturesEnabled = signal<boolean>(false);
 
 export default function HeaderControls() {
   const [columns, setColumns] = useState<Column[]>(() => {
@@ -20,15 +23,19 @@ export default function HeaderControls() {
     return [];
   });
 
-  const formatedNowTime = new Date(currentTime).toLocaleString("en-GB");
+  const formatedNowTime = new Date(currentTime.value).toLocaleString("en-GB");
 
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [userName, setUserName] = useState("");
+  const [isExperimentalEnabled, setIsExperimentalEnabled] = useState(false);
 
   useEffect(() => {
     const hasSeenIntro = localStorage.getItem("chronoflowIntroSeen");
     const savedName = localStorage.getItem("chronoflowUserName");
+    const experimentalFeatures = localStorage.getItem(
+      "chronoflowExperimentalFeatures",
+    );
 
     if (!hasSeenIntro) {
       setShowWelcome(true);
@@ -36,6 +43,11 @@ export default function HeaderControls() {
 
     if (savedName) {
       setUserName(savedName);
+    }
+
+    if (experimentalFeatures === "true") {
+      setIsExperimentalEnabled(true);
+      experimentalFeaturesEnabled.value = true;
     }
   }, []);
 
@@ -60,11 +72,16 @@ export default function HeaderControls() {
     setShowWelcome(false);
   };
 
-  //TODO: interface and tests.
-  const getGreeting: any = () => {
+  interface IGreeting {
+    condition: boolean;
+    text: string;
+    icon: string;
+  }
+
+  const getGreeting = (): IGreeting => {
     const hour = new Date().getHours();
 
-    const greetings = [
+    const greetings: IGreeting[] = [
       {
         condition: hour >= 6 && hour < 12,
         text: "Good morning",
@@ -85,7 +102,8 @@ export default function HeaderControls() {
       },
     ];
 
-    return greetings.find((g) => g.condition);
+    const greeting = greetings.find((g) => g.condition);
+    return greeting || greetings[greetings.length - 1]; // Fallback to last greeting if somehow none match
   };
 
   useEffect(() => {
@@ -108,20 +126,33 @@ export default function HeaderControls() {
     }
   }, [userName]);
 
-  //TODO: could be done better
-  const formatTime = (seconds: number) => {
+  /**
+   * Formats seconds into HH:MM:SS string format
+   * @param seconds - Number of seconds to format
+   * @returns Formatted time string in HH:MM:SS format
+   */
+  const formatTime = (seconds: number): string => {
+    // Handle edge cases
+    if (seconds < 0) return "00:00:00";
+    if (!Number.isFinite(seconds)) return "Invalid input";
+
+    // Calculate hours, minutes, and seconds
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${
-      minutes.toString().padStart(2, "0")
-    }:${secs.toString().padStart(2, "0")}`;
+    const secs = Math.floor(seconds % 60);
+
+    // Format with leading zeros
+    const parts = [
+      hours.toString().padStart(2, "0"),
+      minutes.toString().padStart(2, "0"),
+      secs.toString().padStart(2, "0"),
+    ];
+
+    return parts.join(":");
   };
 
-  //TODO: bug if you move to done or todo still tracking time
   const getTrackedTask = () => {
     for (const column of columns) {
-      // Don't show tracking for done or todo columns
       if (column.id === "done" || column.id === "todo") continue;
 
       const trackedCard = column.cards.find((card) => card.isTracking);
@@ -177,7 +208,6 @@ export default function HeaderControls() {
     exportData(columns);
   };
 
-  //TODO: improved
   const handleImport = (e: JSX.TargetedEvent<HTMLInputElement, Event>) => {
     const input = e.target as HTMLInputElement;
     importData(input.files?.[0], setColumns);
@@ -217,6 +247,7 @@ export default function HeaderControls() {
 
       <div class="relative group">
         <button
+          type="button"
           onClick={handleClearStorage}
           class="flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
         >
@@ -241,6 +272,7 @@ export default function HeaderControls() {
 
       <div class="relative group">
         <button
+          type="button"
           onClick={handleExport}
           disabled={columns.every((col) => col.cards.length === 0)}
           class="flex items-center justify-center p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -295,6 +327,7 @@ export default function HeaderControls() {
 
       <div class="relative group flex items-center gap-2">
         <button
+          type="button"
           onClick={() => setIsChangelogOpen(true)}
           class="flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
@@ -302,6 +335,45 @@ export default function HeaderControls() {
         </button>
         <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
           View Changelog
+        </span>
+      </div>
+
+      <div class="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+      <div class="relative group">
+        <button
+          type="button"
+          onClick={() => {
+            const newValue = !isExperimentalEnabled;
+            setIsExperimentalEnabled(newValue);
+            experimentalFeaturesEnabled.value = newValue;
+            localStorage.setItem(
+              "chronoflowExperimentalFeatures",
+              newValue.toString(),
+            );
+          }}
+          class={`flex items-center justify-center p-1 rounded-lg transition-colors ${
+            isExperimentalEnabled
+              ? "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20"
+              : "text-gray-500 dark:text-gray-400 hover:text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+          }`}
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+            />
+          </svg>
+        </button>
+        <span class="absolute px-2 py-1 bg-gray-900/90 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 -bottom-8 left-1/2 -translate-x-1/2">
+          {isExperimentalEnabled ? "Disable" : "Enable"} Experimental Features
         </span>
       </div>
 

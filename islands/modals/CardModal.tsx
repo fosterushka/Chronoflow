@@ -1,25 +1,18 @@
 import { JSX } from "preact";
-import { useState, useEffect, useMemo } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import GitHubTab from "../GitHubTab.tsx";
 import ContextTab from "../ContextTab.tsx";
 import AuditTab from "../AuditTab.tsx";
 import { createAuditEntry } from "../../core/utils/auditUtils.ts";
-
 import {
   Card,
   CardModalProps,
   ChecklistItem,
   GitHubData,
+  Meeting,
+  RelatedItem,
   TabType,
 } from "../../core/types/ICardModal.ts";
-
-//TODO: First, let's move the ChecklistItem interface outside the component
-interface ChecklistItem {
-  id: string;
-  text: string;
-  isChecked: boolean;
-  createdAt: string;
-}
 
 export default function CardModal({
   isOpen,
@@ -28,7 +21,7 @@ export default function CardModal({
   labels,
   card,
   mode,
-}: CardModalProps): JSX.Element {
+}: CardModalProps): JSX.Element | null {
   const [cardData, setCardData] = useState<Partial<Card>>({
     title: "",
     description: "",
@@ -126,11 +119,15 @@ export default function CardModal({
     setCardData((prev) => ({ ...prev, title: e.currentTarget.value }));
   };
 
-  const handleDescriptionChange = (e: JSX.TargetedEvent<HTMLTextAreaElement>): void => {
+  const handleDescriptionChange = (
+    e: JSX.TargetedEvent<HTMLTextAreaElement>,
+  ): void => {
     setCardData((prev) => ({ ...prev, description: e.currentTarget.value }));
   };
 
-  const handleChecklistInput = (e: JSX.TargetedEvent<HTMLInputElement>): void => {
+  const handleChecklistInput = (
+    e: JSX.TargetedEvent<HTMLInputElement>,
+  ): void => {
     const value = e.currentTarget.value;
     setNewChecklistItem(value);
   };
@@ -184,15 +181,15 @@ export default function CardModal({
     }
 
     setCardData((prevData) => {
-      const updatedChecklist = prevData.checklist?.map(item => 
-        item.id === editingItemId 
-          ? { ...item, text: editingItemText.trim() } 
+      const updatedChecklist = prevData.checklist?.map((item) =>
+        item.id === editingItemId
+          ? { ...item, text: editingItemText.trim() }
           : item
       ) || [];
 
       return {
         ...prevData,
-        checklist: updatedChecklist
+        checklist: updatedChecklist,
       };
     });
 
@@ -218,11 +215,11 @@ export default function CardModal({
     setCardData((prev) => ({ ...prev, github: data }));
   };
 
-  const handleMeetingsChange = (meetings: any[]): void => {
+  const handleMeetingsChange = (meetings: Meeting[]): void => {
     setCardData((prev) => ({ ...prev, meetings }));
   };
 
-  const handleRelatedItemsChange = (items: any[]): void => {
+  const handleRelatedItemsChange = (items: RelatedItem[]): void => {
     setCardData((prev) => ({ ...prev, relatedItems: items }));
   };
 
@@ -249,15 +246,14 @@ export default function CardModal({
     };
 
     if (mode === "add") {
-      createAuditEntry({
-        card: updatedCard,
-        type: "create",
+      createAuditEntry("create", {
+        newValue: updatedCard.title,
       });
     } else {
       if (JSON.stringify(card) !== JSON.stringify(updatedCard)) {
-        createAuditEntry({
-          card: updatedCard,
-          type: "update",
+        createAuditEntry("update", {
+          oldValue: card?.title ?? "",
+          newValue: updatedCard.title,
         });
       }
     }
@@ -271,7 +267,9 @@ export default function CardModal({
     onClose();
   };
 
-  const handleBackdropClick = (e: JSX.TargetedMouseEvent<HTMLDivElement>): void => {
+  const handleBackdropClick = (
+    e: JSX.TargetedMouseEvent<HTMLDivElement>,
+  ): void => {
     if (e.target === e.currentTarget) {
       setIsShaking(true);
       setTimeout(() => {
@@ -315,66 +313,79 @@ export default function CardModal({
                   </svg>
                 )}
               </button>
-              
-              {editingItemId === item.id ? (
-                <div class="flex-1 flex gap-2">
-                  <input
-                    type="text"
-                    value={editingItemText}
-                    onInput={(e) => setEditingItemText(e.currentTarget.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleSaveChecklistItemEdit();
-                      } else if (e.key === "Escape") {
-                        handleCancelChecklistItemEdit();
-                      }
-                    }}
-                    class="flex-1 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all duration-200"
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSaveChecklistItemEdit}
-                    class="p-1 text-green-500 hover:text-green-600"
+
+              {editingItemId === item.id
+                ? (
+                  <div class="flex-1 flex gap-2">
+                    <input
+                      type="text"
+                      value={editingItemText}
+                      onInput={(e) => setEditingItemText(e.currentTarget.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleSaveChecklistItemEdit();
+                        } else if (e.key === "Escape") {
+                          handleCancelChecklistItemEdit();
+                        }
+                      }}
+                      class="flex-1 text-sm bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white transition-all duration-200"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveChecklistItemEdit}
+                      class="p-1 text-green-500 hover:text-green-600"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelChecklistItemEdit}
+                      class="p-1 text-gray-400 hover:text-gray-500"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )
+                : (
+                  <span
+                    class={`flex-1 text-sm transition-all duration-200 ${
+                      item.isChecked
+                        ? "line-through text-gray-400 dark:text-gray-500"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}
+                    onDblClick={() =>
+                      handleChecklistItemEdit(item.id, item.text)}
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCancelChecklistItemEdit}
-                    class="p-1 text-gray-400 hover:text-gray-500"
-                  >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <span
-                  class={`flex-1 text-sm transition-all duration-200 ${
-                    item.isChecked
-                      ? "line-through text-gray-400 dark:text-gray-500"
-                      : "text-gray-700 dark:text-gray-300"
-                  }`}
-                  onDblClick={() => handleChecklistItemEdit(item.id, item.text)}
-                >
-                  {item.text}
-                </span>
-              )}
-              
+                    {item.text}
+                  </span>
+                )}
+
               {editingItemId !== item.id && (
                 <div class="flex gap-1">
                   <button
@@ -382,7 +393,12 @@ export default function CardModal({
                     onClick={() => handleChecklistItemEdit(item.id, item.text)}
                     class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 transition-all duration-200"
                   >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <svg
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -494,8 +510,8 @@ export default function CardModal({
       case "context":
         return (
           <ContextTab
-            meetings={cardData.meetings as any[] || []}
-            relatedItems={cardData.relatedItems as any[] || []}
+            meetings={cardData.meetings as Meeting[] || []}
+            relatedItems={cardData.relatedItems as RelatedItem[] || []}
             onMeetingsChange={handleMeetingsChange}
             onRelatedItemsChange={handleRelatedItemsChange}
           />
@@ -520,7 +536,7 @@ export default function CardModal({
         }`}
       >
         <form
-          onSubmit={(e) => handleSubmit()}
+          onSubmit={(_e) => handleSubmit()}
           class="flex flex-col h-full"
         >
           {/* Header */}
@@ -532,7 +548,7 @@ export default function CardModal({
                 required
                 value={cardData.title}
                 onInput={handleTitleChange}
-                class="w-full text-xl dark:text-gray-300 font-semibold bg-transparent border-0 p-0 focus:outline-none focus:ring-0 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                class="w-full text-x font-semibold bg-transparent border-0 p-0 focus:outline-none focus:ring-0 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Task title"
               />
             </div>

@@ -8,6 +8,7 @@ import * as $index from "./routes/index.tsx";
 import * as $AuditTab from "./islands/AuditTab.tsx";
 import * as $Board from "./islands/Board.tsx";
 import * as $CardPreview from "./islands/CardPreview.tsx";
+import * as $CardPreviewPip from "./islands/CardPreviewPip.tsx";
 import * as $ColumnBoard from "./islands/ColumnBoard.tsx";
 import * as $ContextTab from "./islands/ContextTab.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
@@ -33,6 +34,7 @@ const manifest = {
     "./islands/AuditTab.tsx": $AuditTab,
     "./islands/Board.tsx": $Board,
     "./islands/CardPreview.tsx": $CardPreview,
+    "./islands/CardPreviewPip.tsx": $CardPreviewPip,
     "./islands/ColumnBoard.tsx": $ColumnBoard,
     "./islands/ContextTab.tsx": $ContextTab,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,

@@ -13,12 +13,14 @@ export const formatTime = (seconds: number = 0) => {
 
 export const hasExceededEstimatedTime = (card: Card) => {
   if (!card.estimatedTime) return false;
+  if (!card.timeSpent) return false;
   const estimatedTimeInSeconds = card.estimatedTime * 60;
   return card.timeSpent > estimatedTimeInSeconds;
 };
 
 export const isHalfwayThroughEstimatedTime = (card: Card) => {
   if (!card.estimatedTime) return false;
+  if (!card.timeSpent) return false;
   const estimatedTimeInSeconds = card.estimatedTime * 60;
   const halfTime = estimatedTimeInSeconds / 2;
   return card.timeSpent >= halfTime && card.timeSpent <= estimatedTimeInSeconds;
@@ -30,7 +32,7 @@ export const getTimeBasedColor = (card: Card) => {
       ? card.estimatedTime * 60
       : 0;
     const currentElapsedTime = getElapsedTime(card.lastTrackingStart || 0);
-    const totalTime = card.timeSpent + currentElapsedTime;
+    const totalTime = (card.timeSpent || 0) + currentElapsedTime;
 
     if (estimatedTimeInSeconds && totalTime > estimatedTimeInSeconds) {
       return `bg-red-100/90 dark:bg-red-900/90`;

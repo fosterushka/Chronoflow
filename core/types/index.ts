@@ -1,14 +1,4 @@
-export interface Label {
-  id: string;
-  name: string;
-  color: string;
-}
-
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  isChecked: boolean;
-}
+import { Card as SharedCard } from "./shared.ts";
 
 export interface GitHubContributor {
   login: string;
@@ -23,31 +13,23 @@ export interface GitHubContributor {
   contributions: number;
 }
 
-export interface GitHubData {
-  repo: string;
-  assignees: string[];
-  cachedContributors: GitHubContributor[];
-}
+// Re-export shared types
+export type {
+  AuditEntry,
+  Card,
+  ChecklistItem,
+  ColumnId,
+  GitHubData,
+  Label,
+  Meeting,
+  RelatedItem,
+} from "./shared.ts";
 
-export interface Card {
-  id?: string;
-  title: string;
-  description: string;
-  labels: string[];
-  dueDate: string;
-  estimatedTime: number;
-  timeSpent: number;
-  isTracking: boolean;
-  lastTrackingStart: number;
-  currentElapsedTime: number;
-  checklist: ChecklistItem[];
-  github?: GitHubData;
-}
-
+// Board-specific types
 export interface Column {
   id: string;
   title: string;
-  cards: Card[];
+  cards: SharedCard[];
 }
 
 export interface Statistics {
@@ -58,11 +40,11 @@ export interface Statistics {
 }
 
 export interface DraggedCard {
-  card: Card;
-  columnId: string;
+  card: SharedCard;
+  sourceColumnId: string;
 }
 
 export interface EditingCard {
-  card: Card;
+  card: SharedCard | null;
   columnId: string;
 }

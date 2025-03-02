@@ -32,7 +32,6 @@ export default function ColumnBoard({
   onCardEdit,
   onCardDelete,
   onCardModalOpen,
-  onActiveColumnChange,
   onLabelsCollapse,
 }: ColumnBoardProps) {
   const columns = columnsSignal.value;
@@ -74,6 +73,7 @@ export default function ColumnBoard({
                 </div>
                 {column.id !== TaskStateTypes.DONE && (
                   <button
+                    type="button"
                     onClick={() => onCardModalOpen(column.id)}
                     class="shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >

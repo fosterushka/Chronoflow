@@ -2,10 +2,12 @@ import { JSX } from "preact";
 import { Card } from "../core/types/index.ts";
 import { LABELS } from "../core/utils/boardUtils.ts";
 import { TaskStateTypes } from "../core/types/TaskStateTypes.ts";
-import { useMemo } from "preact/hooks";
+import { useMemo, useRef } from "preact/hooks";
 import { handleCardTracking } from "../core/services/boardService.ts";
 import { useComputed } from "@preact/signals";
 import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
+import CardPreviewPip from "./CardPreviewPip.tsx";
+import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
 
 interface CardPreviewProps {
   card: Card;
@@ -52,13 +54,34 @@ export default function CardPreview({
       card.checklist.length) * 100
     : 0;
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const { isPipOpen, openPictureInPicture } = CardPreviewPip({
+    card,
+    formatTime,
+    getElapsedTime,
+    currentElapsedTime,
+    getTimeBasedColor,
+    hasExceededEstimatedTime,
+    columnId,
+  });
+
+  const handlePictureInPicture = (
+    e: JSX.TargetedMouseEvent<HTMLButtonElement>,
+  ) => {
+    e.stopPropagation();
+    openPictureInPicture();
+  };
+
   return (
     <div
+      ref={cardRef}
       data-card-id={card.id}
       class={`group relative rounded-lg shadow-sm hover:shadow-md transition-all duration-500 cursor-move
         ${getTimeBasedColor(card)}
-        ${card.isTracking ? "ring-2 ring-emerald-500/20" : ""}`}
-      draggable="true"
+        ${card.isTracking ? "ring-2 ring-emerald-500/20" : ""}
+        ${isPipOpen ? "ring-2 ring-blue-500/20" : ""}`}
+      draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
@@ -76,9 +99,12 @@ export default function CardPreview({
           <div class="flex items-center gap-1 shrink-0">
             {isButtonVisible && (
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleCardTracking(columnId, card.id);
+                  if (card.id) {
+                    handleCardTracking(columnId, card.id);
+                  }
                 }}
                 class={`p-1.5 rounded-md transition-all ${
                   card.isTracking
@@ -103,7 +129,34 @@ export default function CardPreview({
                 </svg>
               </button>
             )}
+            {isButtonVisible && experimentalFeaturesEnabled.value && (
+              <button
+                type="button"
+                onClick={handlePictureInPicture}
+                class={`p-1.5 rounded-md transition-all text-gray-400 hover:text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 opacity-0 group-hover:opacity-100 ${
+                  isPipOpen
+                    ? "text-blue-500 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400"
+                    : ""
+                }`}
+                title="Picture-in-Picture"
+              >
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                  />
+                </svg>
+              </button>
+            )}
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(e);

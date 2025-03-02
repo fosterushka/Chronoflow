@@ -17,6 +17,42 @@ import { LABELS } from "../core/utils/boardUtils.ts";
 import type { Card, ColumnId, EditingCard } from "../core/types/index.ts";
 import type { DeleteCardState } from "../core/types/board.ts";
 import { ErrorBoundary } from "../components/ErrorBoundary.tsx";
+import type { Card as ModalCard } from "../core/types/ICardModal.ts";
+
+export const convertModalCardToBoardCard = (modalCard: ModalCard): Card => {
+  return {
+    ...modalCard,
+    isTracking: modalCard.isTracking !== undefined
+      ? modalCard.isTracking
+      : false,
+    lastTrackingStart: modalCard.lastTrackingStart || modalCard.updatedAt ||
+      Date.now(),
+    currentElapsedTime: modalCard.currentElapsedTime || 0,
+    checklist: modalCard.checklist?.map((item) => ({
+      id: item.id,
+      text: item.text,
+      isChecked: item.isChecked,
+    })) || [],
+    dueDate: modalCard.dueDate || "",
+    estimatedTime: modalCard.estimatedTime || 0,
+    timeSpent: modalCard.timeSpent || 0,
+  };
+};
+
+export const convertBoardCardToModalCard = (boardCard: Card): ModalCard => {
+  return {
+    ...boardCard,
+    isTracking: boardCard.isTracking,
+    lastTrackingStart: boardCard.lastTrackingStart,
+    currentElapsedTime: boardCard.currentElapsedTime,
+    checklist: boardCard.checklist?.map((item) => ({
+      id: item.id,
+      text: item.text,
+      isChecked: item.isChecked,
+      createdAt: new Date().toISOString(),
+    })) || [],
+  };
+};
 
 export default function Board() {
   const [isCardModalOpen, setIsCardModalOpen] = useState<boolean>(false);
@@ -98,8 +134,10 @@ export default function Board() {
     setDeletingCard(null);
   }, []);
 
-  const handleCardSubmit = useCallback((updatedCard: Card): void => {
+  const handleCardSubmit = useCallback((updatedCard: ModalCard): void => {
     if (!editingCard) return;
+
+    const boardCard = convertModalCardToBoardCard(updatedCard);
 
     const columns = columnsSignal.value;
     const newColumns = columns.map((col) => {
@@ -109,14 +147,14 @@ export default function Board() {
           return {
             ...col,
             cards: col.cards.map((c) =>
-              c.id === updatedCard.id ? { ...c, ...updatedCard } : c
+              c.id === boardCard.id ? { ...c, ...boardCard } : c
             ),
           };
         } else {
           // Add new card
           return {
             ...col,
-            cards: [...col.cards, { ...updatedCard, id: crypto.randomUUID() }],
+            cards: [...col.cards, { ...boardCard, id: crypto.randomUUID() }],
           };
         }
       }
@@ -139,7 +177,8 @@ export default function Board() {
             {error.message}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            type="button"
+            onClick={() => globalThis.location.reload()}
             class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
             Reload Board
@@ -183,7 +222,9 @@ export default function Board() {
             onClose={handleCloseCardModal}
             onSubmit={handleCardSubmit}
             labels={LABELS}
-            card={editingCard.card}
+            card={editingCard.card
+              ? convertBoardCardToModalCard(editingCard.card)
+              : null}
             mode={editingCard.card ? "edit" : "add"}
           />
         )}

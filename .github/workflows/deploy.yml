@@ -32,5 +32,3 @@ jobs:
           project: "chronoflow"
           entrypoint: "main.ts"
           root: "."
-          
-          
