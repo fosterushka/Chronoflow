@@ -28,3 +28,5 @@ export interface BoardStore {
   isLabelsCollapsed: boolean;
   showMobileWarning: boolean;
 }
+
+

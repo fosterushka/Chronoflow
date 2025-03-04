@@ -8,6 +8,7 @@ import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
 import { labelsSignal } from "../core/signals/labelSignals.ts";
 import CardPreviewPip from "./CardPreviewPip.tsx";
 import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
+import { archiveCard } from "../core/utils/archiveUtils.ts";
 
 interface CardPreviewProps {
   card: Card;
@@ -71,6 +72,14 @@ export default function CardPreview({
   ) => {
     e.stopPropagation();
     openPictureInPicture();
+  };
+
+  const handleDelete = (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    // Archive the card before deletion
+    archiveCard(card, columnId);
+    // Proceed with normal deletion
+    onDelete(e);
   };
 
   return (
@@ -158,10 +167,7 @@ export default function CardPreview({
             )}
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(e);
-              }}
+              onClick={handleDelete}
               class="p-1.5 text-gray-400 rounded-full opacity-0 group-hover:opacity-100 shadow-sm"
             >
               <svg

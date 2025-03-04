@@ -203,7 +203,7 @@ export default function Board() {
         </div>
       )}
     >
-      <div class="h-full w-full flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-all duration-300 overflow-x-hidden">
+      <div class="h-full w-full flex flex-col overflow-x-hidden">
         <ColumnBoard
           onDragStart={(card, columnId) => {
             draggedCardSignal.value = { card, sourceColumnId: columnId };

@@ -11,8 +11,9 @@ export const changelog = [
     date: "04/03/2025",
     changes: [
       "Added customizable labels with colors",
+      "Archiving and restoring deleted tasks",
       "Enhanced state management system",
-      "Improved modal rendering using portals",
+      "Improved popup windows rendering using portals",
       "Added experimental features toggle",
       "Added tracked task preview in header",
       "Enhanced dark theme UI",
@@ -25,7 +26,7 @@ export const changelog = [
     ],
   },
   {
-    version: "0.0.4",
+    version: "0.0.4a",
     date: "29/11/2024",
     changes: [
       "Welcoming screen",

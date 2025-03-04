@@ -41,15 +41,10 @@ export function Header({ _stats = null }: IHeaderProps) {
             <div id="greeting-container" class="hidden sm:block" />
           </div>
         </div>
-
-        {/* Desktop Menu */}
-        <div class="hidden sm:flex items-center gap-4">
-          <div class="flex items-center gap-3">
-            <HeaderControls onCardEdit={cardEditSignal.value} />
-            <DarkModeToggle />
-          </div>
+        <div class="flex items-center gap-4">
+          <HeaderControls onCardEdit={cardEditSignal.value} />
+          <DarkModeToggle />
         </div>
-
         {/* Mobile Menu Button */}
         <button
           type="button"

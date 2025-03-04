@@ -2,13 +2,22 @@
 
 All notable changes to Chronoflow will be documented in this file.
 
-## [v0.0.4t] - 2024-11-29
+## [v0.0.4RC] - 2025-03-04
 
-### 🎨 UI/UX Improvements
+### 🎨 Worksapce seperated boards,PIP and much more.
 
-- Simplified label color selection with predefined colors
-- Improved label management interface
-- Enhanced label dropdown usability
+- Added customizable labels with colors
+- Archiving and restoring deleted tasks
+- Enhanced state management system
+- Improved popup windows rendering using portals
+- Added experimental features toggle
+- Added tracked task preview in header
+- Enhanced dark theme UI
+- Major code refactoring and cleanup
+- Performance optimizations
+- Added task filtering system
+- Added multi-project board support
+- PWA support
 
 ## [v0.0.4] - 2024-11-29
 

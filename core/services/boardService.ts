@@ -4,6 +4,9 @@ import { getElapsedTime } from "../signals/timeSignals.ts";
 import { columnsSignal, updateCardTracking } from "../signals/boardSignals.ts";
 import { dispatchBoardUpdate } from "../utils/boardUtils.ts";
 
+/**
+ * Format time in seconds to a human-readable string
+ */
 export const formatTime = (seconds: number = 0) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -11,6 +14,9 @@ export const formatTime = (seconds: number = 0) => {
   return `${hours}h ${minutes}m ${remainingSeconds}s`;
 };
 
+/**
+ * Check if a card has exceeded its estimated time
+ */
 export const hasExceededEstimatedTime = (card: Card) => {
   if (!card.estimatedTime) return false;
   if (!card.timeSpent) return false;
@@ -18,6 +24,9 @@ export const hasExceededEstimatedTime = (card: Card) => {
   return card.timeSpent > estimatedTimeInSeconds;
 };
 
+/**
+ * Check if a card is halfway through its estimated time
+ */
 export const isHalfwayThroughEstimatedTime = (card: Card) => {
   if (!card.estimatedTime) return false;
   if (!card.timeSpent) return false;
@@ -26,6 +35,9 @@ export const isHalfwayThroughEstimatedTime = (card: Card) => {
   return card.timeSpent >= halfTime && card.timeSpent <= estimatedTimeInSeconds;
 };
 
+/**
+ * Get the appropriate color class based on a card's time status
+ */
 export const getTimeBasedColor = (card: Card) => {
   if (card.isTracking) {
     const estimatedTimeInSeconds = card.estimatedTime
@@ -52,6 +64,9 @@ export const getTimeBasedColor = (card: Card) => {
   return `bg-white/90 dark:bg-gray-800/90 border-gray-200/30 dark:border-gray-700/30`;
 };
 
+/**
+ * Calculate board statistics based on columns data
+ */
 export const getBoardStatistics = (columns: Column[]) => {
   const totalTasks = columns.reduce(
     (acc, col) => acc + col.cards.length,
@@ -78,16 +93,22 @@ export const getBoardStatistics = (columns: Column[]) => {
   };
 };
 
+/**
+ * Sync current board state with localStorage and dispatch update event
+ */
 export const syncWithLocalStorage = () => {
   if (typeof localStorage !== "undefined") {
-    localStorage.setItem(
-      "chronoflowColumns",
-      JSON.stringify(columnsSignal.value),
-    );
+    // Save the current columns to localStorage
+    localStorage.setItem("chronoflowColumns", JSON.stringify(columnsSignal.value));
+    
+    // Dispatch board update event for other components
     dispatchBoardUpdate(columnsSignal.value);
   }
 };
 
+/**
+ * Handle card tracking state toggle
+ */
 export const handleCardTracking = (columnId: string, cardId: string) => {
   const column = columnsSignal.value.find((col) => col.id === columnId);
   const card = column?.cards.find((c) => c.id === cardId);
@@ -96,9 +117,14 @@ export const handleCardTracking = (columnId: string, cardId: string) => {
 
   const isTracking = !card.isTracking;
   updateCardTracking(columnId, cardId, isTracking);
+  
+  // Make sure to persist changes
   syncWithLocalStorage();
 };
 
+/**
+ * Determine if tracking should be stopped based on column movement
+ */
 export const shouldStopTracking = (targetColumnId: string, card: Card) => {
   return (targetColumnId === TaskStateTypes.TODO ||
     targetColumnId === TaskStateTypes.DONE) && card.isTracking;

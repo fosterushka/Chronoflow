@@ -18,6 +18,7 @@ import * as $HeaderControls from "./islands/HeaderControls.tsx";
 import * as $LabelDropdown from "./islands/LabelDropdown.tsx";
 import * as $LabelManager from "./islands/LabelManager.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
+import * as $modals_ArchivedCardsModal from "./islands/modals/ArchivedCardsModal.tsx";
 import * as $modals_CardModal from "./islands/modals/CardModal.tsx";
 import * as $modals_ChangelogModal from "./islands/modals/ChangelogModal.tsx";
 import * as $modals_DeleteCardModal from "./islands/modals/DeleteCardModal.tsx";
@@ -46,6 +47,7 @@ const manifest = {
     "./islands/LabelDropdown.tsx": $LabelDropdown,
     "./islands/LabelManager.tsx": $LabelManager,
     "./islands/Statistics.tsx": $Statistics,
+    "./islands/modals/ArchivedCardsModal.tsx": $modals_ArchivedCardsModal,
     "./islands/modals/CardModal.tsx": $modals_CardModal,
     "./islands/modals/ChangelogModal.tsx": $modals_ChangelogModal,
     "./islands/modals/DeleteCardModal.tsx": $modals_DeleteCardModal,

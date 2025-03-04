@@ -39,7 +39,7 @@ export default function ColumnBoard({
 
   return (
     <div class="h-screen flex flex-col">
-      <div class="flex-1 p-6 bg-gradient-to-br from-gray-50/80 to-gray-100/80 dark:from-gray-900/90 dark:to-gray-800/90 min-h-0 overflow-x-auto backdrop-blur-sm">
+      <div class="flex-1 p-6 ">
         <div class="flex gap-5 h-full min-w-full">
           {columns?.map((column) => (
             <div
