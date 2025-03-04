@@ -1,26 +1,27 @@
-import { Card } from "../core/types/shared.ts";
 import DarkModeToggle from "./DarkModeToggle.tsx";
 import HeaderControls from "./HeaderControls.tsx";
 import { useState } from "preact/hooks";
+import { cardEditSignal } from "./Board.tsx";
+import { Card } from "../core/types/ICardModal.ts";
 
 export interface IHeaderProps {
   _stats?: [] | null;
-  onCardEdit?: (card: Card, columnId: string) => void;
+  onCardEdit?: ((card: Card, columnId: string) => void) | null;
 }
 
-export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
+export function Header({ _stats = null }: IHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div
       id="header"
-      class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-sm sticky top-0 z-50"
+      class="backdrop-blur-md bg-white/70 dark:bg-gray-800/80 border-b border-gray-100/30 dark:border-gray-700/30 shadow-lg sticky top-0 z-50 transition-all duration-300 w-full"
     >
-      <div class="flex items-center justify-between px-4 h-14">
-        <div class="flex items-center gap-3">
-          <div class="w-6 h-6 flex-shrink-0 bg-indigo-500 rounded flex items-center justify-center">
+      <div class="flex items-center justify-between px-6 h-16">
+        <div class="flex items-center gap-4">
+          <div class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md transform hover:scale-105 transition-all duration-300">
             <svg
-              class="w-4 h-4 text-white"
+              class="w-5 h-5 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -33,8 +34,8 @@ export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
               />
             </svg>
           </div>
-          <div class="flex items-center gap-2">
-            <h1 class="hidden sm:block font-semibold text-gray-700 dark:text-white text-sm">
+          <div class="flex items-center gap-3">
+            <h1 class="hidden sm:block font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 text-base">
               Chronoflow
             </h1>
             <div id="greeting-container" class="hidden sm:block" />
@@ -43,8 +44,8 @@ export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
 
         {/* Desktop Menu */}
         <div class="hidden sm:flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <HeaderControls onCardEdit={onCardEdit} />
+          <div class="flex items-center gap-3">
+            <HeaderControls onCardEdit={cardEditSignal.value} />
             <DarkModeToggle />
           </div>
         </div>
@@ -53,7 +54,7 @@ export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          class="sm:hidden p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          class="sm:hidden p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-lg backdrop-blur-sm transition-all duration-300"
         >
           <svg
             class="w-6 h-6"
@@ -84,16 +85,16 @@ export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div class="fixed inset-0 bg-white dark:bg-gray-800 z-50">
+        <div class="fixed inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg z-50 transition-all duration-300">
           <div class="flex flex-col h-full">
-            <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
-              <h1 class="font-semibold text-gray-700 dark:text-white">
+            <div class="flex items-center justify-between p-6 border-b border-gray-100/30 dark:border-gray-700/30">
+              <h1 class="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
                 Chronoflow
               </h1>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                class="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-lg backdrop-blur-sm transition-all duration-300"
               >
                 <svg
                   class="w-6 h-6"
@@ -110,15 +111,15 @@ export function Header({ _stats = null, onCardEdit }: IHeaderProps) {
                 </svg>
               </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4">
-              <div class="space-y-6">
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="space-y-8">
                 {/* Controls */}
-                <div class="space-y-4">
-                  <h2 class="text-sm font-medium text-gray-900 dark:text-white">
+                <div class="space-y-6">
+                  <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Controls
                   </h2>
-                  <div class="flex flex-col gap-4">
-                    <HeaderControls onCardEdit={onCardEdit} />
+                  <div class="flex flex-col gap-6">
+                    <HeaderControls onCardEdit={cardEditSignal.value} />
                     <DarkModeToggle />
                   </div>
                 </div>

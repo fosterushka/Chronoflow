@@ -12,6 +12,7 @@ import { changelog } from "./modals/ChangelogModal.tsx";
 import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
 import { signal } from "@preact/signals";
 import { IHeaderProps } from "./Header.tsx";
+import Portal from "../components/Portal.tsx";
 
 export const experimentalFeaturesEnabled = signal<boolean>(false);
 
@@ -370,16 +371,20 @@ export default function HeaderControls({
         </span>
       </div>
 
-      <ChangelogModal
-        isOpen={isChangelogOpen}
-        onClose={() => setIsChangelogOpen(false)}
-      />
+      <Portal>
+        <ChangelogModal
+          isOpen={isChangelogOpen}
+          onClose={() => setIsChangelogOpen(false)}
+        />
+      </Portal>
 
-      <WelcomeModal
-        isOpen={showWelcome}
-        onClose={handleWelcomeSkip}
-        onComplete={handleWelcomeComplete}
-      />
+      <Portal>
+        <WelcomeModal
+          isOpen={showWelcome}
+          onClose={handleWelcomeSkip}
+          onComplete={handleWelcomeComplete}
+        />
+      </Portal>
     </div>
   );
 }

@@ -7,6 +7,24 @@ interface ChangelogModalProps {
 
 export const changelog = [
   {
+    version: "0.0.4RC",
+    date: "04/03/2025",
+    changes: [
+      "Added customizable labels with colors",
+      "Enhanced state management system",
+      "Improved modal rendering using portals",
+      "Added experimental features toggle",
+      "Added tracked task preview in header",
+      "Enhanced dark theme UI",
+      "Major code refactoring and cleanup",
+      "Performance optimizations",
+      "Added task filtering system",
+      "Added multi-project board support",
+      "PWA support",
+      "Service worker,PIP (Experimental)",
+    ],
+  },
+  {
     version: "0.0.4",
     date: "29/11/2024",
     changes: [
@@ -62,7 +80,7 @@ export default function ChangelogModal(
   if (!isOpen) return null;
 
   return (
-    <div class="fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 z-[100] overflow-y-auto w-full h-full">
       <div class="flex items-center justify-center min-h-screen px-4 py-8">
         <div
           class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"

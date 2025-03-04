@@ -55,7 +55,7 @@ const WelcomeModal = memo(function WelcomeModal(
   };
 
   return (
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 w-full h-full">
       <div class="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl transform transition-all duration-300 ease-in-out">
         {currentSlide < features.length
           ? (

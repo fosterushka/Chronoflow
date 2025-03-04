@@ -2,6 +2,14 @@
 
 All notable changes to Chronoflow will be documented in this file.
 
+## [v0.0.4t] - 2024-11-29
+
+### 🎨 UI/UX Improvements
+
+- Simplified label color selection with predefined colors
+- Improved label management interface
+- Enhanced label dropdown usability
+
 ## [v0.0.4] - 2024-11-29
 
 ### 🚀 GitHub Integration

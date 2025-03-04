@@ -5,7 +5,7 @@ interface DeleteCardModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  card: Card;
+  card: Card | undefined;
 }
 
 export default function DeleteCardModal(
@@ -53,7 +53,7 @@ export default function DeleteCardModal(
                 Are you sure you want to delete
               </p>
               <p class="font-medium text-gray-900 dark:text-white text-lg">
-                "{card.title}"
+                "{card?.title}"
               </p>
               <p class="text-sm text-red-500 dark:text-red-400 font-medium mt-4">
                 This action cannot be undone.

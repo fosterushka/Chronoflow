@@ -13,12 +13,12 @@ import {
   RelatedItem,
   TabType,
 } from "../../core/types/ICardModal.ts";
+import LabelDropdown from "../LabelDropdown.tsx";
 
 export default function CardModal({
   isOpen,
   onClose,
   onSubmit,
-  labels,
   card,
   mode,
 }: CardModalProps): JSX.Element | null {
@@ -531,7 +531,7 @@ export default function CardModal({
 
   return (
     <div
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start sm:items-center justify-center p-2 z-50 overflow-y-auto"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start sm:items-center justify-center p-2 z-[100] overflow-y-auto w-full h-full"
       onClick={handleBackdropClick}
     >
       <div
@@ -638,25 +638,10 @@ export default function CardModal({
             <div class="w-72 p-6 bg-gray-50 dark:bg-gray-800/50 border-l border-gray-100 dark:border-gray-700">
               {/* Labels */}
               <div class="mb-6">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                  Labels
-                </label>
-                <div class="flex flex-wrap gap-2">
-                  {labels.map((label) => (
-                    <button
-                      key={label.id}
-                      type="button"
-                      onClick={() => handleLabelToggle(label.id)}
-                      class={`${label.color} text-white text-xs px-3 py-1.5 rounded-full transition-all duration-200 ${
-                        (cardData.labels || []).includes(label.id)
-                          ? "opacity-100"
-                          : "opacity-40"
-                      }`}
-                    >
-                      {label.name}
-                    </button>
-                  ))}
-                </div>
+                <LabelDropdown
+                  selectedLabels={cardData.labels || []}
+                  onLabelToggle={handleLabelToggle}
+                />
               </div>
 
               {/* Due Date */}
