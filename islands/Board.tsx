@@ -19,6 +19,13 @@ import type { DeleteCardState } from "../core/types/board.ts";
 import { ErrorBoundary } from "../components/ErrorBoundary.tsx";
 import type { Card as ModalCard } from "../core/types/ICardModal.ts";
 import Portal from "../components/Portal.tsx";
+import {
+  checkTimeThresholds,
+  initializeNotifications,
+  resetCardWarnings,
+  timeWarningSignal,
+} from "../core/signals/timeSignals.ts";
+import TimeWarningModal from "./modals/TimeWarningModal.tsx";
 
 export const convertModalCardToBoardCard = (modalCard: ModalCard): Card => {
   return {
@@ -183,6 +190,39 @@ export default function Board() {
     setEditingCard(null);
   }, [editingCard]);
 
+  useEffect(() => {
+    // Initialize notifications when component mounts
+    initializeNotifications();
+
+    // Set up interval to check time thresholds
+    const checkInterval = setInterval(() => {
+      columnsSignal.value.forEach((column) => {
+        column.cards.forEach((card) => {
+          if (card.isTracking) {
+            checkTimeThresholds(card);
+          }
+        });
+      });
+    }, 1000);
+
+    // No need to reset warnings when tracking starts/stops
+    const unsubscribe = columnsSignal.subscribe(() => {
+      // Only subscribe to changes, no warning resets
+    });
+
+    return () => {
+      clearInterval(checkInterval);
+      unsubscribe();
+    };
+  }, []);
+
+  const currentWarning = timeWarningSignal.value;
+  const warningCard = currentWarning.cardId
+    ? columnsSignal.value
+      .flatMap((col) => col.cards)
+      .find((card) => card.id === currentWarning.cardId)
+    : null;
+
   return (
     <ErrorBoundary
       fallback={(error) => (
@@ -281,6 +321,21 @@ export default function Board() {
             }}
           />
         </Portal>
+
+        {warningCard && currentWarning.type !== "normal" && (
+          <Portal>
+            <TimeWarningModal
+              cardTitle={warningCard.title}
+              type={currentWarning.type as "warning" | "exceeded"}
+              onClose={() => {
+                timeWarningSignal.value = {
+                  type: "normal",
+                  cardId: null,
+                };
+              }}
+            />
+          </Portal>
+        )}
       </div>
     </ErrorBoundary>
   );

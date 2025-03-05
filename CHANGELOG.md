@@ -4,18 +4,19 @@ All notable changes to Chronoflow will be documented in this file.
 
 ## [v0.0.4RC] - 2025-03-04
 
-### 🎨 Worksapce seperated boards,PIP and much more.
+### 🎨 Worksapce seperated boards, PIP and much more.
 
 - Added customizable labels with colors
 - Archiving and restoring deleted tasks
 - Enhanced state management system
 - Improved popup windows rendering using portals
 - Added experimental features toggle
+  - Column collapse functionality
+  - Global task filtering system (search and labels)
 - Added tracked task preview in header
 - Enhanced dark theme UI
 - Major code refactoring and cleanup
 - Performance optimizations
-- Added task filtering system
 - Added multi-project board support
 - PWA support
 
