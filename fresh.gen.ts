@@ -8,17 +8,23 @@ import * as $index from "./routes/index.tsx";
 import * as $AuditTab from "./islands/AuditTab.tsx";
 import * as $Board from "./islands/Board.tsx";
 import * as $CardPreview from "./islands/CardPreview.tsx";
+import * as $CardPreviewPip from "./islands/CardPreviewPip.tsx";
 import * as $ColumnBoard from "./islands/ColumnBoard.tsx";
 import * as $ContextTab from "./islands/ContextTab.tsx";
 import * as $DarkModeToggle from "./islands/DarkModeToggle.tsx";
+import * as $FilterBar from "./islands/FilterBar.tsx";
 import * as $GitHubTab from "./islands/GitHubTab.tsx";
 import * as $Header from "./islands/Header.tsx";
 import * as $HeaderControls from "./islands/HeaderControls.tsx";
+import * as $LabelDropdown from "./islands/LabelDropdown.tsx";
+import * as $LabelManager from "./islands/LabelManager.tsx";
 import * as $Statistics from "./islands/Statistics.tsx";
+import * as $modals_ArchivedCardsModal from "./islands/modals/ArchivedCardsModal.tsx";
 import * as $modals_CardModal from "./islands/modals/CardModal.tsx";
 import * as $modals_ChangelogModal from "./islands/modals/ChangelogModal.tsx";
 import * as $modals_DeleteCardModal from "./islands/modals/DeleteCardModal.tsx";
 import * as $modals_MobileWarningModal from "./islands/modals/MobileWarningModal.tsx";
+import * as $modals_TimeWarningModal from "./islands/modals/TimeWarningModal.tsx";
 import * as $modals_WelcomeModal from "./islands/modals/WelcomeModal.tsx";
 import * as $ui_UrlInput from "./islands/ui/UrlInput.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -33,17 +39,23 @@ const manifest = {
     "./islands/AuditTab.tsx": $AuditTab,
     "./islands/Board.tsx": $Board,
     "./islands/CardPreview.tsx": $CardPreview,
+    "./islands/CardPreviewPip.tsx": $CardPreviewPip,
     "./islands/ColumnBoard.tsx": $ColumnBoard,
     "./islands/ContextTab.tsx": $ContextTab,
     "./islands/DarkModeToggle.tsx": $DarkModeToggle,
+    "./islands/FilterBar.tsx": $FilterBar,
     "./islands/GitHubTab.tsx": $GitHubTab,
     "./islands/Header.tsx": $Header,
     "./islands/HeaderControls.tsx": $HeaderControls,
+    "./islands/LabelDropdown.tsx": $LabelDropdown,
+    "./islands/LabelManager.tsx": $LabelManager,
     "./islands/Statistics.tsx": $Statistics,
+    "./islands/modals/ArchivedCardsModal.tsx": $modals_ArchivedCardsModal,
     "./islands/modals/CardModal.tsx": $modals_CardModal,
     "./islands/modals/ChangelogModal.tsx": $modals_ChangelogModal,
     "./islands/modals/DeleteCardModal.tsx": $modals_DeleteCardModal,
     "./islands/modals/MobileWarningModal.tsx": $modals_MobileWarningModal,
+    "./islands/modals/TimeWarningModal.tsx": $modals_TimeWarningModal,
     "./islands/modals/WelcomeModal.tsx": $modals_WelcomeModal,
     "./islands/ui/UrlInput.tsx": $ui_UrlInput,
   },

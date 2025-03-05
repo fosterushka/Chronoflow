@@ -1,11 +1,14 @@
 import { JSX } from "preact";
 import { Card } from "../core/types/index.ts";
-import { LABELS } from "../core/utils/boardUtils.ts";
 import { TaskStateTypes } from "../core/types/TaskStateTypes.ts";
-import { useMemo } from "preact/hooks";
+import { useMemo, useRef } from "preact/hooks";
 import { handleCardTracking } from "../core/services/boardService.ts";
 import { useComputed } from "@preact/signals";
 import { currentTime, getElapsedTime } from "../core/signals/timeSignals.ts";
+import { labelsSignal } from "../core/signals/labelSignals.ts";
+import CardPreviewPip from "./CardPreviewPip.tsx";
+import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
+import { archiveCard } from "../core/utils/archiveUtils.ts";
 
 interface CardPreviewProps {
   card: Card;
@@ -52,13 +55,43 @@ export default function CardPreview({
       card.checklist.length) * 100
     : 0;
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const { isPipOpen, openPictureInPicture } = CardPreviewPip({
+    card,
+    formatTime,
+    getElapsedTime,
+    currentElapsedTime,
+    getTimeBasedColor,
+    hasExceededEstimatedTime,
+    columnId,
+  });
+
+  const handlePictureInPicture = (
+    e: JSX.TargetedMouseEvent<HTMLButtonElement>,
+  ) => {
+    e.stopPropagation();
+    openPictureInPicture();
+  };
+
+  const handleDelete = (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    // Archive the card before deletion
+    archiveCard(card, columnId);
+    // Proceed with normal deletion
+    onDelete(e);
+  };
+
   return (
     <div
+      ref={cardRef}
       data-card-id={card.id}
-      class={`group relative rounded-lg shadow-sm hover:shadow-md transition-all duration-500 cursor-move
-        ${getTimeBasedColor(card)}
-        ${card.isTracking ? "ring-2 ring-emerald-500/20" : ""}`}
-      draggable="true"
+      class={`group relative rounded-xl backdrop-blur-m shadow-md border border-gray-200/30 dark:border-gray-700/30 cursor-move ${
+        getTimeBasedColor(card)
+      }
+        ${card.isTracking ? "ring-2 ring-emerald-500/30" : ""}
+        ${isPipOpen ? "ring-2 ring-blue-500/30" : ""}`}
+      draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
@@ -67,23 +100,26 @@ export default function CardPreview({
         onClick();
       }}
     >
-      <div class="flex flex-col p-3 gap-2">
+      <div class="flex flex-col p-4 gap-3">
         {/* Header with title and actions */}
         <div class="flex items-start justify-between gap-2">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 flex-1">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 flex-1 leading-snug">
             {card.title}
           </h3>
           <div class="flex items-center gap-1 shrink-0">
             {isButtonVisible && (
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleCardTracking(columnId, card.id);
+                  if (card.id) {
+                    handleCardTracking(columnId, card.id);
+                  }
                 }}
-                class={`p-1.5 rounded-md transition-all ${
+                class={`p-1.5 rounded-full ${
                   card.isTracking
-                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10"
-                    : "text-gray-400 hover:text-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-500/20 shadow-sm"
+                    : "text-gray-400"
                 } opacity-0 group-hover:opacity-100`}
               >
                 <svg
@@ -103,12 +139,36 @@ export default function CardPreview({
                 </svg>
               </button>
             )}
+            {isButtonVisible && experimentalFeaturesEnabled.value && (
+              <button
+                type="button"
+                onClick={handlePictureInPicture}
+                class={`p-1.5 rounded-full text-gray-400 opacity-0 group-hover:opacity-100 ${
+                  isPipOpen
+                    ? "text-blue-500 bg-blue-50/80 dark:bg-blue-500/20 dark:text-blue-400 shadow-sm"
+                    : ""
+                }`}
+                title="Picture-in-Picture"
+              >
+                <svg
+                  class="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
+                  />
+                </svg>
+              </button>
+            )}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(e);
-              }}
-              class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+              type="button"
+              onClick={handleDelete}
+              class="p-1.5 text-gray-400 rounded-full opacity-0 group-hover:opacity-100 shadow-sm"
             >
               <svg
                 class="w-3.5 h-3.5"
@@ -131,7 +191,7 @@ export default function CardPreview({
         {card.labels && card.labels.length > 0 && (
           <div class="flex flex-wrap gap-1">
             {card.labels.map((labelId) => {
-              const label = LABELS.find((l) => l.id === labelId);
+              const label = labelsSignal.value.find((l) => l.id === labelId);
               if (!label) return null;
               return (
                 <span
@@ -140,13 +200,13 @@ export default function CardPreview({
                     e.stopPropagation();
                     onLabelClick();
                   }}
-                  class={`${label.color} !bg-opacity-100 text-white text-xs px-2 rounded-full cursor-pointer shrink-0 inline-flex items-center transition-all duration-200
+                  class={`${label.color} !bg-opacity-100 text-white text-xs px-2 rounded-full cursor-pointer shrink-0 inline-flex items-center
                   ${isLabelsCollapsed ? "w-6 h-6" : "h-6 min-w-[24px]"}`}
                 >
                   <span
                     class={`${
                       isLabelsCollapsed ? "opacity-0" : "opacity-100"
-                    } transition-opacity duration-200 truncate`}
+                    } truncate`}
                   >
                     {label.name}
                   </span>
@@ -159,7 +219,7 @@ export default function CardPreview({
         {/* Metadata and Progress */}
         <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           {/* Time tracking */}
-          {isButtonVisible && currentElapsedTime.value > 0 && (
+          {currentElapsedTime.value > 0 && (
             <span
               class={`inline-flex items-center gap-1 ${
                 hasExceededEstimatedTime(card)
@@ -182,7 +242,7 @@ export default function CardPreview({
               </svg>
               {formatTime(currentElapsedTime.value)}
               {card.estimatedTime && (
-                <span class="text-gray-400 dark:text-gray-500">
+                <span class="text-gray-900 dark:text-white">
                   / {formatTime(card.estimatedTime * 60)}
                 </span>
               )}

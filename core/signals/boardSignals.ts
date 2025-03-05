@@ -1,7 +1,11 @@
-import { computed, signal, Signal, ReadonlySignal } from "@preact/signals";
+import { computed, ReadonlySignal, Signal, signal } from "@preact/signals";
 import type { Card, Column, DraggedCard } from "../types/index.ts";
 import { getElapsedTime } from "./timeSignals.ts";
-import { createAuditEntry, addAuditEntry } from "../utils/auditUtils.ts";
+import { addAuditEntry, createAuditEntry } from "../utils/auditUtils.ts";
+import {
+  convertBoardCardToModalCard,
+  convertModalCardToBoardCard,
+} from "../../islands/Board.tsx";
 
 // Types
 interface BoardStore {
@@ -13,8 +17,16 @@ interface BoardStore {
   activeCards: ReadonlySignal<number>;
   trackedCards: ReadonlySignal<number>;
   currentTrackedCard: ReadonlySignal<{ card: Card; columnId: string } | null>;
-  updateCardTracking: (columnId: string, cardId: string, isTracking: boolean) => void;
-  moveCard: (card: Card, sourceColumnId: string, targetColumnId: string) => void;
+  updateCardTracking: (
+    columnId: string,
+    cardId: string,
+    isTracking: boolean,
+  ) => void;
+  moveCard: (
+    card: Card,
+    sourceColumnId: string,
+    targetColumnId: string,
+  ) => void;
   cleanup: () => void;
 }
 
@@ -105,25 +117,36 @@ const createBoardStore = (): BoardStore => {
                 lastTrackingStart: Date.now(),
                 currentElapsedTime: 0,
               };
-              return addAuditEntry(updatedCard, createAuditEntry('status_change', {
-                oldValue: 'not_tracking',
-                newValue: 'tracking',
-                columnId
-              }));
+              return convertModalCardToBoardCard(
+                addAuditEntry(
+                  convertBoardCardToModalCard(updatedCard),
+                  createAuditEntry("status_change", {
+                    oldValue: "not_tracking",
+                    newValue: "tracking",
+                    columnId,
+                  }),
+                ),
+              );
             }
             if (card.isTracking) {
               const updatedCard = {
                 ...card,
                 isTracking: false,
-                lastTrackingStart: undefined,
-                timeSpent: (card.timeSpent || 0) + getElapsedTime(card.lastTrackingStart || 0),
+                lastTrackingStart: 0,
+                timeSpent: (card.timeSpent || 0) +
+                  getElapsedTime(card.lastTrackingStart || 0),
                 currentElapsedTime: 0,
               };
-              return addAuditEntry(updatedCard, createAuditEntry('status_change', {
-                oldValue: 'tracking',
-                newValue: 'not_tracking',
-                columnId: column.id
-              }));
+              return convertModalCardToBoardCard(
+                addAuditEntry(
+                  convertBoardCardToModalCard(updatedCard),
+                  createAuditEntry("status_change", {
+                    oldValue: "tracking",
+                    newValue: "not_tracking",
+                    columnId: column.id,
+                  }),
+                ),
+              );
             }
             return card;
           }),
@@ -138,15 +161,21 @@ const createBoardStore = (): BoardStore => {
               const updatedCard = {
                 ...card,
                 isTracking: false,
-                lastTrackingStart: undefined,
-                timeSpent: (card.timeSpent || 0) + getElapsedTime(card.lastTrackingStart || 0),
+                lastTrackingStart: 0,
+                timeSpent: (card.timeSpent || 0) +
+                  getElapsedTime(card.lastTrackingStart || 0),
                 currentElapsedTime: 0,
               };
-              return addAuditEntry(updatedCard, createAuditEntry('status_change', {
-                oldValue: 'tracking',
-                newValue: 'not_tracking',
-                columnId
-              }));
+              return convertModalCardToBoardCard(
+                addAuditEntry(
+                  convertBoardCardToModalCard(updatedCard),
+                  createAuditEntry("status_change", {
+                    oldValue: "tracking",
+                    newValue: "not_tracking",
+                    columnId,
+                  }),
+                ),
+              );
             }
             return card;
           }),
@@ -163,24 +192,29 @@ const createBoardStore = (): BoardStore => {
   ) => {
     // Stop tracking if card is moved to done or todo
     const shouldStopTrack =
-      (targetColumnId === "done" || targetColumnId === "todo") && card.isTracking;
+      (targetColumnId === "done" || targetColumnId === "todo") &&
+      card.isTracking;
 
     const updatedCard = shouldStopTrack
       ? {
         ...card,
         isTracking: false,
-        lastTrackingStart: undefined,
-        timeSpent: (card.timeSpent || 0) + getElapsedTime(card.lastTrackingStart || 0),
+        lastTrackingStart: 0,
+        timeSpent: (card.timeSpent || 0) +
+          getElapsedTime(card.lastTrackingStart || 0),
         currentElapsedTime: 0,
       }
       : card;
 
     // Add move audit entry
-    const cardWithAudit = addAuditEntry(updatedCard, createAuditEntry('move', {
-      oldValue: sourceColumnId,
-      newValue: targetColumnId,
-      columnId: targetColumnId
-    }));
+    const cardWithAudit = addAuditEntry(
+      convertBoardCardToModalCard(updatedCard),
+      createAuditEntry("move", {
+        oldValue: sourceColumnId,
+        newValue: targetColumnId,
+        columnId: targetColumnId,
+      }),
+    );
 
     columns.value = columns.value.map((column) => {
       if (column.id === sourceColumnId) {
@@ -192,7 +226,7 @@ const createBoardStore = (): BoardStore => {
       if (column.id === targetColumnId) {
         return {
           ...column,
-          cards: [...column.cards, cardWithAudit],
+          cards: [...column.cards, convertModalCardToBoardCard(cardWithAudit)],
         };
       }
       return column;

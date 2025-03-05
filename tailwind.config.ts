@@ -1,7 +1,6 @@
 import { type Config } from "tailwindcss";
 
 export default {
-  plugins: [],
   content: [
     "{routes,islands,components}/**/*.{ts,tsx}",
   ],
@@ -37,8 +36,8 @@ export default {
     "dark:bg-red-900/20",
     "bg-amber-50/90",
     "dark:bg-amber-50/90",
-    "bg-amber-900/20",
-    "dark:bg-amber-900/20",
+    "bg-amber-500/20",
+    "dark:bg-amber-500/20",
     "bg-white/90",
     "dark:bg-white/90",
     "bg-gray-800/90",
@@ -63,8 +62,42 @@ export default {
     "dark:border-emerald-800",
     "dark:border-red-900/30",
     "dark:border-amber-900/30",
+    "dark:border-amber-900/20",
     "dark:border-gray-700",
     "dark:border-red-900/30",
+    // Background colors for tracking states
+    "bg-red-500/40",
+    "dark:bg-red-400/40",
+    "bg-amber-500/40",
+    "dark:bg-amber-400/40",
+    "bg-emerald-500/40",
+    "dark:bg-emerald-400/40",
+    // Background colors for non-tracking states
+    "bg-red-500/20",
+    "dark:bg-red-400/20",
+    "bg-amber-500/20",
+    "dark:bg-amber-400/20",
+    // Border colors for tracking states
+    "border-red-500",
+    "dark:border-red-400",
+    "border-amber-500",
+    "dark:border-amber-400",
+    "border-emerald-500",
+    "dark:border-emerald-400",
+    // Border colors for non-tracking states
+    "border-red-500/20",
+    "dark:border-red-400/20",
+    "border-amber-500/20",
+    "dark:border-amber-400/20",
+    // Text colors
+    "text-red-500",
+    "dark:text-red-400",
+    "text-amber-500",
+    "dark:text-amber-400",
+    "text-emerald-500",
+    "dark:text-emerald-400",
+    "text-gray-500",
+    "dark:text-gray-400",
   ],
   theme: {
     extend: {
@@ -86,5 +119,8 @@ export default {
         "ping-once": "ping 0.5s cubic-bezier(0, 0, 0.2, 1) forwards",
       },
     },
+  },
+  future: {
+    hoverOnlyWhenSupported: true,
   },
 } satisfies Config;

@@ -8,14 +8,14 @@ export default function Error404() {
         <title>404 - Page not found</title>
       </Head>
       <div class="h-screen flex flex-col">
-        <Header stats={[]} />
+        <Header />
         <div class="flex-1 p-6 bg-gradient-to-b from-gray-100/50 to-gray-200/50 dark:from-gray-900 dark:to-gray-800">
           <div class="max-w-4xl mx-auto h-full flex items-center justify-center">
             <div class="w-full relative">
               {/* Decorative elements */}
               <div class="absolute -top-16 -left-16 w-32 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-xl animate-pulse" />
               <div class="absolute -bottom-8 -right-8 w-24 h-24 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-lg animate-pulse delay-150" />
-              
+
               <div class="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 dark:border-gray-700/50 p-12">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-8">
                   {/* Left side - Content */}
@@ -24,10 +24,14 @@ export default function Error404() {
                       <span class="text-4xl font-bold text-white">404</span>
                     </div>
                     <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4 tracking-tight">
-                      Oops! Lost in <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Time</span>
+                      Oops! Lost in{" "}
+                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
+                        Time
+                      </span>
                     </h1>
                     <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                      The page you're looking for seems to have slipped through a time warp.
+                      The page you're looking for seems to have slipped through
+                      a time warp.
                     </p>
                     <div class="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                       <a
@@ -49,28 +53,9 @@ export default function Error404() {
                         </svg>
                         Return Home
                       </a>
-                      <button
-                        onClick={() => window.history.back()}
-                        class="group w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-700 dark:text-white bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors duration-200"
-                      >
-                        <svg
-                          class="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                          />
-                        </svg>
-                        Go Back
-                      </button>
                     </div>
                   </div>
-                  
+
                   {/* Right side - Decorative illustration */}
                   <div class="relative w-64 h-64 flex-shrink-0">
                     <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-600/20 rounded-full animate-pulse" />

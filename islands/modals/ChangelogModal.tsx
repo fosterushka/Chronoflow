@@ -7,7 +7,26 @@ interface ChangelogModalProps {
 
 export const changelog = [
   {
-    version: "0.0.4",
+    version: "0.0.4RC",
+    date: "04/03/2025",
+    changes: [
+      "Added customizable labels with colors",
+      "Archiving and restoring deleted tasks",
+      "Enhanced state management system",
+      "Improved popup windows rendering using portals",
+      "Added experimental features toggle",
+      "Added tracked task preview in header",
+      "Enhanced dark theme UI",
+      "Major code refactoring and cleanup",
+      "Performance optimizations",
+      "Added task filtering system",
+      "Added multi-project board support",
+      "PWA support",
+      "Service worker,PIP (Experimental)",
+    ],
+  },
+  {
+    version: "0.0.4a",
     date: "29/11/2024",
     changes: [
       "Welcoming screen",
@@ -58,11 +77,11 @@ export const changelog = [
 
 export default function ChangelogModal(
   { isOpen, onClose }: ChangelogModalProps,
-): JSX.Element {
-  if (!isOpen) return <></>;
+): JSX.Element | null {
+  if (!isOpen) return null;
 
   return (
-    <div class="fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 z-[100] overflow-y-auto w-full h-full">
       <div class="flex items-center justify-center min-h-screen px-4 py-8">
         <div
           class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -93,6 +112,7 @@ export default function ChangelogModal(
               </h2>
             </div>
             <button
+              type="button"
               onClick={onClose}
               class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
@@ -180,15 +200,3 @@ export default function ChangelogModal(
     </div>
   );
 }
-
-// Add this animation to your global CSS or tailwind config if not already added
-/*
-@keyframes fade-scale-up {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-fade-scale-up {
-  animation: fade-scale-up 0.3s ease-out forwards;
-}
-*/

@@ -4,8 +4,8 @@ export const createAuditEntry = (
   type: AuditEntry["type"],
   options: {
     field?: string;
-    oldValue?: any;
-    newValue?: any;
+    oldValue?: string;
+    newValue?: string;
     userId?: string;
     columnId?: string;
   } = {},

@@ -1,5 +1,3 @@
-import { JSX } from "preact";
-
 interface MobileWarningModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -45,6 +43,7 @@ export default function MobileWarningModal(
 
         <div class="p-6 flex justify-center border-t border-gray-100 dark:border-gray-700">
           <button
+            type="button"
             onClick={onClose}
             class="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] animate-pulse-subtle"
           >
@@ -55,33 +54,3 @@ export default function MobileWarningModal(
     </div>
   );
 }
-
-// Add these animations to your global CSS or tailwind config
-/*
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes fade-scale-up {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s ease-in-out infinite;
-}
-
-.animate-fade-scale-up {
-  animation: fade-scale-up 0.3s ease-out forwards;
-}
-*/
