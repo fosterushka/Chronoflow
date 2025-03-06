@@ -1,5 +1,4 @@
 import { JSX } from "preact";
-import { timeWarningSignal } from "../../core/signals/timeSignals.ts";
 
 interface TimeWarningModalProps {
   cardTitle: string;
@@ -35,6 +34,7 @@ export default function TimeWarningModal(
         </div>
         <div class="border-t border-gray-100 dark:border-gray-700 p-4 flex justify-end">
           <button
+            type="button"
             onClick={onClose}
             class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >

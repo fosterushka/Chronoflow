@@ -5,7 +5,6 @@ import {
 } from "../../core/utils/archiveUtils.ts";
 import { columnsSignal } from "../../core/signals/boardSignals.ts";
 import { formatTime } from "../../core/services/boardService.ts";
-import { useComputed } from "@preact/signals";
 
 interface ArchivedCardsModalProps {
   isOpen: boolean;
@@ -26,8 +25,6 @@ export default function ArchivedCardsModal(
   const handleRestore = (cardId: string) => {
     const restored = restoreCard(cardId);
     if (!restored) return;
-
-    // Update columns with restored card
     const columns = columnsSignal.value;
     const updatedColumns = columns.map((col) => {
       if (col.id === restored.columnId) {
@@ -40,7 +37,6 @@ export default function ArchivedCardsModal(
     });
     columnsSignal.value = updatedColumns;
 
-    // Update archived cards list
     setArchivedCards(getRecentlyDeletedCards());
   };
 
@@ -101,7 +97,8 @@ export default function ArchivedCardsModal(
                     </p>
                   </div>
                   <button
-                    onClick={() => handleRestore(card.id)}
+                    type="button"
+                    onClick={() => card.id && handleRestore(card.id)}
                     class="ml-4 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
                   >
                     Restore

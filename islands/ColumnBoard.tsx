@@ -14,7 +14,6 @@ import {
 import { signal } from "@preact/signals";
 import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
 import { filterSignal } from "../core/signals/filterSignals.ts";
-import FilterBar from "./FilterBar.tsx";
 
 // Add a signal for collapsed columns
 const collapsedColumnsSignal = signal<Set<string>>(new Set());
@@ -126,6 +125,7 @@ export default function ColumnBoard({
                   <div class="flex items-center gap-3 min-w-0">
                     {isExperimental && (
                       <button
+                        type="button"
                         onClick={() => toggleColumnCollapse(column.id)}
                         class="shrink-0 p-1 text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-300"
                         title={isCollapsed

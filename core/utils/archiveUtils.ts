@@ -1,4 +1,4 @@
-import { Card, Column } from "../types/index.ts";
+import { Card } from "../types/index.ts";
 
 interface ArchivedCard extends Card {
   deletedAt: number;
@@ -32,7 +32,7 @@ export const restoreCard = (
   const newArchive = archive.filter((card) => card.id !== cardId);
   saveArchive(newArchive);
 
-  const { deletedAt, originalColumnId, ...restoredCard } = archivedCard;
+  const { originalColumnId, ...restoredCard } = archivedCard;
   return {
     card: restoredCard,
     columnId: originalColumnId,

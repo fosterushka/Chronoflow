@@ -127,6 +127,7 @@ export function Header({ _stats = null }: IHeaderProps) {
               />
               {filterSignal.value.searchQuery && (
                 <button
+                  type="button"
                   onClick={() => {
                     filterSignal.value = {
                       ...filterSignal.value,
@@ -154,6 +155,7 @@ export function Header({ _stats = null }: IHeaderProps) {
 
             <div class="relative" ref={labelDropdownRef}>
               <button
+                type="button"
                 onClick={() =>
                   showLabelDropdown.value = !showLabelDropdown.value}
                 class="h-9 px-3 text-sm bg-white/70 dark:bg-gray-800/70 border border-gray-200/30 dark:border-gray-700/30 rounded-lg hover:bg-white/90 dark:hover:bg-gray-800/90 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:text-white flex items-center gap-2"
@@ -194,6 +196,7 @@ export function Header({ _stats = null }: IHeaderProps) {
             {(filterSignal.value.searchQuery ||
               filterSignal.value.selectedLabels.length > 0) && (
               <button
+                type="button"
                 onClick={clearAllFilters}
                 class="h-9 px-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >

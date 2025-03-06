@@ -99,8 +99,11 @@ export const getBoardStatistics = (columns: Column[]) => {
 export const syncWithLocalStorage = () => {
   if (typeof localStorage !== "undefined") {
     // Save the current columns to localStorage
-    localStorage.setItem("chronoflowColumns", JSON.stringify(columnsSignal.value));
-    
+    localStorage.setItem(
+      "chronoflowColumns",
+      JSON.stringify(columnsSignal.value),
+    );
+
     // Dispatch board update event for other components
     dispatchBoardUpdate(columnsSignal.value);
   }
@@ -117,7 +120,7 @@ export const handleCardTracking = (columnId: string, cardId: string) => {
 
   const isTracking = !card.isTracking;
   updateCardTracking(columnId, cardId, isTracking);
-  
+
   // Make sure to persist changes
   syncWithLocalStorage();
 };

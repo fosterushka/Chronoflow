@@ -60,12 +60,12 @@ export async function initializeNotifications() {
 export function checkTimeThresholds(card: Card) {
   if (!card.isTracking || !card.estimatedTime) return;
 
-  const currentElapsed = getElapsedTime(card.lastTrackingStart);
+  const currentElapsed = getElapsedTime(card.lastTrackingStart || Date.now());
   const totalTime = (card.timeSpent || 0) + currentElapsed;
   const estimatedSeconds = card.estimatedTime * 60;
 
   // Get or initialize the set of shown warnings for this card
-  if (!shownWarnings.has(card.id)) {
+  if (card.id && !shownWarnings.has(card.id)) {
     shownWarnings.set(card.id, new Set());
   }
   const cardWarnings = shownWarnings.get(card.id)!;
@@ -74,7 +74,7 @@ export function checkTimeThresholds(card: Card) {
   if (totalTime >= estimatedSeconds && !cardWarnings.has("exceeded")) {
     timeWarningSignal.value = {
       type: "exceeded",
-      cardId: card.id,
+      cardId: card.id ?? null,
     };
     cardWarnings.add("exceeded");
     sendNotification("Time Exceeded!", card.title);
@@ -86,7 +86,7 @@ export function checkTimeThresholds(card: Card) {
   ) {
     timeWarningSignal.value = {
       type: "warning",
-      cardId: card.id,
+      cardId: card.id ?? null,
     };
     cardWarnings.add("warning");
     sendNotification("Time Warning!", card.title);

@@ -22,7 +22,6 @@ import Portal from "../components/Portal.tsx";
 import {
   checkTimeThresholds,
   initializeNotifications,
-  resetCardWarnings,
   timeWarningSignal,
 } from "../core/signals/timeSignals.ts";
 import TimeWarningModal from "./modals/TimeWarningModal.tsx";

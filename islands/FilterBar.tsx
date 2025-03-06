@@ -46,6 +46,7 @@ export default function FilterBar() {
           />
           {filterSignal.value.searchQuery && (
             <button
+              type="button"
               onClick={() => {
                 filterSignal.value = {
                   ...filterSignal.value,
@@ -73,6 +74,7 @@ export default function FilterBar() {
 
         <div class="relative">
           <button
+            type="button"
             onClick={() => showLabelDropdown.value = !showLabelDropdown.value}
             class="px-4 py-2 bg-white/70 dark:bg-gray-800/70 border border-gray-200/30 dark:border-gray-700/30 rounded-lg hover:bg-white/90 dark:hover:bg-gray-800/90 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:text-white flex items-center gap-2"
           >
@@ -110,6 +112,7 @@ export default function FilterBar() {
         {(filterSignal.value.searchQuery ||
           filterSignal.value.selectedLabels.length > 0) && (
           <button
+            type="button"
             onClick={clearAllFilters}
             class="px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
           >
