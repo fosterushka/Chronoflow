@@ -1,5 +1,6 @@
 import { computed, signal } from "@preact/signals";
 import type { Card } from "../types/index.ts";
+import { addNotification } from "./notificationSignals.ts";
 
 /** Current timestamp signal */
 export const currentTime = signal(Date.now());
@@ -77,6 +78,16 @@ export function checkTimeThresholds(card: Card) {
       cardId: card.id ?? null,
     };
     cardWarnings.add("exceeded");
+
+    // Add floating notification
+    addNotification({
+      title: "Time Exceeded!",
+      message: `Task "${card.title}" has exceeded its estimated time.`,
+      type: "exceeded",
+      cardId: card.id,
+    });
+
+    // Send browser notification
     sendNotification("Time Exceeded!", card.title);
   } // Only show warning if we haven't shown it or exceeded warning before
   else if (
@@ -89,6 +100,16 @@ export function checkTimeThresholds(card: Card) {
       cardId: card.id ?? null,
     };
     cardWarnings.add("warning");
+
+    // Add floating notification
+    addNotification({
+      title: "Time Warning!",
+      message: `Task "${card.title}" has reached 50% of its estimated time.`,
+      type: "warning",
+      cardId: card.id,
+    });
+
+    // Send browser notification
     sendNotification("Time Warning!", card.title);
   }
 }

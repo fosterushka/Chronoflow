@@ -14,9 +14,15 @@ import {
 import { signal } from "@preact/signals";
 import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
 import { filterSignal } from "../core/signals/filterSignals.ts";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 // Add a signal for collapsed columns
 const collapsedColumnsSignal = signal<Set<string>>(new Set());
+
+interface DragIndicator {
+  columnId: string;
+  index: number;
+}
 
 interface ColumnBoardProps {
   onDragStart: (card: Card, columnId: string) => void;
@@ -28,6 +34,7 @@ interface ColumnBoardProps {
   onCardModalOpen: (columnId: string) => void;
   onActiveColumnChange: (columnId: string) => void;
   onLabelsCollapse: (collapsed: boolean) => void;
+  onReorder: (columnId: string, draggedId: string, targetIndex: number) => void;
 }
 
 export default function ColumnBoard({
@@ -39,6 +46,7 @@ export default function ColumnBoard({
   onCardDelete,
   onCardModalOpen,
   onLabelsCollapse,
+  onReorder,
 }: ColumnBoardProps) {
   const columns = columnsSignal.value;
   const isLabelsCollapsed = isLabelsCollapsedSignal.value;
@@ -80,6 +88,65 @@ export default function ColumnBoard({
     collapsedColumnsSignal.value = newCollapsed;
   };
 
+  const [dragIndicator, setDragIndicator] = useState<DragIndicator | null>(
+    null,
+  );
+  const [draggedCard, setDraggedCard] = useState<Card | null>(null);
+  const dragGhostRef = useRef<HTMLDivElement>(null);
+
+  // Add effect to handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDragIndicator(null);
+        setDraggedCard(null);
+        onDragEnd();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleDragOver = (
+    e: DragEvent,
+    columnId: string,
+    cardIndex: number,
+  ) => {
+    e.preventDefault();
+    if (!draggedCard) return;
+
+    const cardElement = (e.target as HTMLElement).closest("[data-card-id]");
+    if (!cardElement) {
+      setDragIndicator({
+        columnId,
+        index: 0,
+      });
+      return;
+    }
+
+    const rect = cardElement.getBoundingClientRect();
+    const mouseY = e.clientY;
+    const threshold = rect.top + (rect.height * 0.5);
+    const index = mouseY <= threshold ? cardIndex : cardIndex + 1;
+
+    setDragIndicator({
+      columnId,
+      index,
+    });
+  };
+
+  const handleColumnDragOver = (e: DragEvent, columnId: string) => {
+    e.preventDefault();
+    const column = columns.find((col) => col.id === columnId);
+    if (column && column.cards.length === 0) {
+      setDragIndicator({
+        columnId,
+        index: 0,
+      });
+    }
+  };
+
   return (
     <div class="h-screen flex flex-col">
       <div class="flex-1 p-6">
@@ -87,7 +154,6 @@ export default function ColumnBoard({
           {columns?.map((column) => {
             const isCollapsed = isExperimental &&
               collapsedColumnsSignal.value.has(column.id);
-            // Only apply filters if experimental features are enabled
             const filteredCards = isExperimental
               ? filterCards(column.cards)
               : column.cards;
@@ -110,8 +176,19 @@ export default function ColumnBoard({
                   border border-gray-200/30 dark:border-gray-700/30 
                   hover:shadow-xl
                 `}
-                onDragOver={onDragOver}
-                onDrop={() => onDrop(column.id)}
+                onDragOver={(e) => handleColumnDragOver(e, column.id)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (dragIndicator && draggedCard) {
+                    onDrop(column.id);
+                    // Handle reordering after column change
+                    setTimeout(() => {
+                      onReorder(column.id, draggedCard.id, dragIndicator.index);
+                    }, 0);
+                  }
+                  setDragIndicator(null);
+                  setDraggedCard(null);
+                }}
               >
                 <div
                   class={`
@@ -198,34 +275,86 @@ export default function ColumnBoard({
                 </div>
                 {(!isExperimental || !isCollapsed) && (
                   <div class="flex-1 min-h-0 relative">
-                    <div class="absolute inset-0 hover:overflow-y-overlay p-3 space-y-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
-                      {filteredCards.map((card) => (
-                        <CardPreview
-                          key={card.id}
-                          card={card}
-                          columnId={column.id}
-                          isLabelsCollapsed={isLabelsCollapsed}
-                          onLabelClick={() =>
-                            onLabelsCollapse(!isLabelsCollapsed)}
-                          onDragStart={() => onDragStart(card, column.id)}
-                          onDragEnd={onDragEnd}
-                          onDragOver={onDragOver}
-                          onClick={() => onCardEdit(card, column.id)}
-                          onDelete={(e) => {
-                            e.preventDefault();
-                            onCardDelete(card, column.id);
-                          }}
-                          getTimeBasedColor={getTimeBasedColor}
-                          formatTime={formatTime}
-                          hasExceededEstimatedTime={hasExceededEstimatedTime}
-                        />
+                    <div class="absolute inset-0 p-3 space-y-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                      {filteredCards.map((card, index) => (
+                        <div key={card.id}>
+                          {dragIndicator?.columnId === column.id &&
+                            dragIndicator.index === index && (
+                            <div class="h-20 border-2 border-blue-500 border-dashed rounded-lg bg-blue-50/50 dark:bg-blue-900/20 mb-2 transition-all duration-200" />
+                          )}
+                          <div class="mb-2">
+                            <CardPreview
+                              card={card}
+                              columnId={column.id}
+                              isLabelsCollapsed={isLabelsCollapsed}
+                              onLabelClick={() =>
+                                onLabelsCollapse(!isLabelsCollapsed)}
+                              onDragStart={(e) => {
+                                setDraggedCard(card);
+                                onDragStart(card, column.id);
+
+                                if (dragGhostRef.current) {
+                                  const ghost = dragGhostRef.current.cloneNode(
+                                    true,
+                                  ) as HTMLDivElement;
+                                  ghost.style.position = "absolute";
+                                  ghost.style.top = "-1000px";
+                                  ghost.style.opacity = "0.8";
+                                  document.body.appendChild(ghost);
+                                  e.dataTransfer?.setDragImage(ghost, 0, 0);
+                                  setTimeout(() => ghost.remove(), 0);
+                                }
+                              }}
+                              onDragEnd={() => {
+                                setDragIndicator(null);
+                                setDraggedCard(null);
+                                onDragEnd();
+                              }}
+                              onDragOver={(e) =>
+                                handleDragOver(e, column.id, index)}
+                              onClick={() => onCardEdit(card, column.id)}
+                              onDelete={(e) => {
+                                e.preventDefault();
+                                onCardDelete(card, column.id);
+                              }}
+                              getTimeBasedColor={getTimeBasedColor}
+                              formatTime={formatTime}
+                              hasExceededEstimatedTime={hasExceededEstimatedTime}
+                            />
+                          </div>
+                          {dragIndicator?.columnId === column.id &&
+                            dragIndicator.index === index + 1 &&
+                            index === filteredCards.length - 1 && (
+                            <div class="h-20 border-2 border-blue-500 border-dashed rounded-lg bg-blue-50/50 dark:bg-blue-900/20 transition-all duration-200" />
+                          )}
+                        </div>
                       ))}
+
+                      {/* Show indicator for empty column */}
+                      {dragIndicator?.columnId === column.id &&
+                        filteredCards.length === 0 && (
+                        <div class="h-20 border-2 border-blue-500 border-dashed rounded-lg bg-blue-50/50 dark:bg-blue-900/20 transition-all duration-200" />
+                      )}
                     </div>
                   </div>
                 )}
               </div>
             );
           })}
+        </div>
+      </div>
+      {/* Ghost element for drag preview */}
+      <div
+        ref={dragGhostRef}
+        class="fixed top-0 left-0 pointer-events-none opacity-0"
+        style={{ transform: "translateX(-100%)" }}
+      >
+        <div class="w-[280px] bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
+          {draggedCard && (
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+              {draggedCard.title}
+            </h3>
+          )}
         </div>
       </div>
     </div>

@@ -2,9 +2,9 @@
 
 All notable changes to Chronoflow will be documented in this file.
 
-## [v0.0.4RC] - 2025-03-04
+## [v0.0.5] - 2025-03-09
 
-### 🎨 Worksapce seperated boards, PIP and much more.
+### 🎨 Worksapce boards, Filtering, PIP and much more.
 
 - Added customizable labels with colors
 - Archiving and restoring deleted tasks
@@ -19,6 +19,8 @@ All notable changes to Chronoflow will be documented in this file.
 - Performance optimizations
 - Added multi-project board support
 - PWA support
+- Notification system
+- Better drag&drop with visual feedback
 
 ## [v0.0.4] - 2024-11-29
 

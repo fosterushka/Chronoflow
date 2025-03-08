@@ -15,6 +15,7 @@ import { IHeaderProps } from "./Header.tsx";
 import Portal from "../components/Portal.tsx";
 import ArchivedCardsModal from "./modals/ArchivedCardsModal.tsx";
 import Tooltip from "../components/Tooltip.tsx";
+import { formatTimeHHMMSS } from "../core/utils/timeUtils.ts";
 
 export const experimentalFeaturesEnabled = signal<boolean>(false);
 
@@ -125,22 +126,7 @@ export default function HeaderControls({
     }
   }, [userName]);
 
-  const formatTime = (seconds: number): string => {
-    if (seconds < 0) return "00:00:00";
-    if (!Number.isFinite(seconds)) return "Invalid input";
-
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    const parts = [
-      hours.toString().padStart(2, "0"),
-      minutes.toString().padStart(2, "0"),
-      secs.toString().padStart(2, "0"),
-    ];
-
-    return parts.join(":");
-  };
+  const formatTime = formatTimeHHMMSS;
 
   const getTrackedTask = () => {
     for (const column of columns) {

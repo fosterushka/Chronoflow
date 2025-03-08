@@ -1,6 +1,7 @@
 import { JSX } from "preact";
 import { useMemo } from "preact/hooks";
 import type { AuditEntry } from "../core/types/ICardModal.ts";
+import { formatRelativeTime } from "../core/utils/timeUtils.ts";
 
 interface AuditTabProps {
   auditHistory?: AuditEntry[];
@@ -100,25 +101,7 @@ export default function AuditTab(
     return [...auditHistory].sort((a, b) => b.timestamp - a.timestamp);
   }, [auditHistory]);
 
-  const formatTimestamp = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } else if (diffInHours < 48) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-      });
-    }
-  };
+  const formatTimestamp = formatRelativeTime;
 
   const getAuditColor = (type: AuditEntry["type"]): string => {
     switch (type) {

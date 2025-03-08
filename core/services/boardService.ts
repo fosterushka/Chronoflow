@@ -3,16 +3,9 @@ import { TaskStateTypes } from "../types/TaskStateTypes.ts";
 import { getElapsedTime } from "../signals/timeSignals.ts";
 import { columnsSignal, updateCardTracking } from "../signals/boardSignals.ts";
 import { dispatchBoardUpdate } from "../utils/boardUtils.ts";
+import { formatTimeHuman } from "../utils/timeUtils.ts";
 
-/**
- * Format time in seconds to a human-readable string
- */
-export const formatTime = (seconds: number = 0) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  return `${hours}h ${minutes}m ${remainingSeconds}s`;
-};
+export { formatTimeHuman as formatTime };
 
 /**
  * Check if a card has exceeded its estimated time

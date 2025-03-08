@@ -24,8 +24,8 @@ import * as $modals_CardModal from "./islands/modals/CardModal.tsx";
 import * as $modals_ChangelogModal from "./islands/modals/ChangelogModal.tsx";
 import * as $modals_DeleteCardModal from "./islands/modals/DeleteCardModal.tsx";
 import * as $modals_MobileWarningModal from "./islands/modals/MobileWarningModal.tsx";
-import * as $modals_TimeWarningModal from "./islands/modals/TimeWarningModal.tsx";
 import * as $modals_WelcomeModal from "./islands/modals/WelcomeModal.tsx";
+import * as $notifications_FloatingNotification from "./islands/notifications/FloatingNotification.tsx";
 import * as $ui_UrlInput from "./islands/ui/UrlInput.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -55,8 +55,9 @@ const manifest = {
     "./islands/modals/ChangelogModal.tsx": $modals_ChangelogModal,
     "./islands/modals/DeleteCardModal.tsx": $modals_DeleteCardModal,
     "./islands/modals/MobileWarningModal.tsx": $modals_MobileWarningModal,
-    "./islands/modals/TimeWarningModal.tsx": $modals_TimeWarningModal,
     "./islands/modals/WelcomeModal.tsx": $modals_WelcomeModal,
+    "./islands/notifications/FloatingNotification.tsx":
+      $notifications_FloatingNotification,
     "./islands/ui/UrlInput.tsx": $ui_UrlInput,
   },
   baseUrl: import.meta.url,

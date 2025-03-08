@@ -1,6 +1,8 @@
 import { Head } from "$fresh/runtime.ts";
 import Board from "../islands/Board.tsx";
 import { Header } from "../islands/Header.tsx";
+import FloatingNotification from "../islands/notifications/FloatingNotification.tsx";
+import { notificationsSignal } from "../core/signals/notificationSignals.ts";
 
 export default function Home() {
   return (
@@ -14,7 +16,19 @@ export default function Home() {
         <div class="flex-1 w-full">
           <Board />
         </div>
-        <div id="portal-root"></div>
+        <div id="portal-root">
+          {notificationsSignal.value.map((notification) => (
+            <FloatingNotification
+              key={notification.id}
+              notification={notification}
+              onDismiss={() => {
+                notificationsSignal.value = notificationsSignal.value.filter(
+                  (n) => n.id !== notification.id,
+                );
+              }}
+            />
+          ))}
+        </div>
       </main>
     </>
   );

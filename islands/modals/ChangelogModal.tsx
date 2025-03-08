@@ -7,22 +7,30 @@ interface ChangelogModalProps {
 
 export const changelog = [
   {
-    version: "0.0.4RC",
-    date: "04/03/2025",
+    version: "0.0.5",
+    date: "09/03/2025",
     changes: [
-      "Added customizable labels with colors",
-      "Archiving and restoring deleted tasks",
-      "Enhanced state management system",
-      "Improved popup windows rendering using portals",
-      "Added experimental features toggle",
-      "Added tracked task preview in header",
-      "Enhanced dark theme UI",
-      "Major code refactoring and cleanup",
-      "Performance optimizations",
-      "Added task filtering system",
-      "Added multi-project board support",
-      "PWA support",
-      "Service worker,PIP (Experimental)",
+      "✨ Core Features",
+      "- Customizable labels with colors",
+      "- Multi-project board support",
+      "- Global task filtering system (search and labels)",
+      "- Archiving and restoring deleted tasks",
+
+      "🎨 UI Improvements",
+      "- Enhanced dark theme UI",
+      "- Better drag & drop with visual feedback",
+      "- Improved popup windows using portals",
+      "- Tracked task preview in header",
+
+      "⚡ Performance & Technical",
+      "- Enhanced state management system",
+      "- Major code refactoring and cleanup",
+      "- Performance optimizations",
+
+      "🔥 Experimental Features",
+      "- Column collapse functionality",
+      "- PWA support",
+      "- Notification system",
     ],
   },
   {

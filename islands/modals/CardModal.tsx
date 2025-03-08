@@ -4,6 +4,7 @@ import GitHubTab from "../GitHubTab.tsx";
 import ContextTab from "../ContextTab.tsx";
 import AuditTab from "../AuditTab.tsx";
 import { createAuditEntry } from "../../core/utils/auditUtils.ts";
+import { applyTrackedChanges } from "../../core/services/changeTrackingService.ts";
 import {
   Card,
   CardModalProps,
@@ -229,7 +230,7 @@ export default function CardModal({
       return;
     }
 
-    const updatedCard: Card = {
+    let finalCard: Card = {
       id: card?.id || crypto.randomUUID(),
       title: cardData.title.trim(),
       description: cardData.description?.trim() || "",
@@ -250,19 +251,17 @@ export default function CardModal({
     };
 
     if (mode === "add") {
-      createAuditEntry("create", {
-        newValue: updatedCard.title,
-      });
-    } else {
-      if (JSON.stringify(card) !== JSON.stringify(updatedCard)) {
-        createAuditEntry("update", {
-          oldValue: card?.title ?? "",
-          newValue: updatedCard.title,
-        });
-      }
+      finalCard.auditHistory = [
+        createAuditEntry("create", {
+          newValue: finalCard.title,
+        }),
+      ];
+    } else if (card) {
+      // Track all changes between old and new card
+      finalCard = applyTrackedChanges(card, finalCard);
     }
 
-    onSubmit(updatedCard);
+    onSubmit(finalCard);
     onClose();
   };
 

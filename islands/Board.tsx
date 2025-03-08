@@ -24,7 +24,6 @@ import {
   initializeNotifications,
   timeWarningSignal,
 } from "../core/signals/timeSignals.ts";
-import TimeWarningModal from "./modals/TimeWarningModal.tsx";
 
 export const convertModalCardToBoardCard = (modalCard: ModalCard): Card => {
   return {
@@ -189,6 +188,34 @@ export default function Board() {
     setEditingCard(null);
   }, [editingCard]);
 
+  const handleCardReorder = (
+    columnId: string,
+    draggedId: string,
+    targetIndex: number,
+  ) => {
+    const columns = columnsSignal.value;
+    const newColumns = columns.map((col) => {
+      if (col.id === columnId) {
+        const cards = [...col.cards];
+        const draggedCard = cards.find((c) => c.id === draggedId);
+        const currentIndex = cards.findIndex((c) => c.id === draggedId);
+
+        if (draggedCard && currentIndex !== -1) {
+          cards.splice(currentIndex, 1);
+          cards.splice(targetIndex, 0, draggedCard);
+        }
+
+        return {
+          ...col,
+          cards,
+        };
+      }
+      return col;
+    });
+
+    columnsSignal.value = newColumns;
+  };
+
   useEffect(() => {
     // Initialize notifications when component mounts
     initializeNotifications();
@@ -270,6 +297,7 @@ export default function Board() {
           onLabelsCollapse={(collapsed) => {
             isLabelsCollapsedSignal.value = collapsed;
           }}
+          onReorder={handleCardReorder}
         />
 
         <Portal>
@@ -320,21 +348,6 @@ export default function Board() {
             }}
           />
         </Portal>
-
-        {warningCard && currentWarning.type !== "normal" && (
-          <Portal>
-            <TimeWarningModal
-              cardTitle={warningCard.title}
-              type={currentWarning.type as "warning" | "exceeded"}
-              onClose={() => {
-                timeWarningSignal.value = {
-                  type: "normal",
-                  cardId: null,
-                };
-              }}
-            />
-          </Portal>
-        )}
       </div>
     </ErrorBoundary>
   );

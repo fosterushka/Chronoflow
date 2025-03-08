@@ -8,6 +8,12 @@ import { filterSignal } from "../core/signals/filterSignals.ts";
 import { labelsSignal } from "../core/signals/labelSignals.ts";
 import { Label } from "../core/types/shared.ts";
 import { experimentalFeaturesEnabled } from "./HeaderControls.tsx";
+import {
+  clearAllNotifications,
+  getUnreadCount,
+  markAsRead,
+  notificationsSignal,
+} from "../core/signals/notificationSignals.ts";
 
 export interface IHeaderProps {
   _stats?: [] | null;
@@ -18,6 +24,8 @@ export function Header({ _stats = null }: IHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const showLabelDropdown = useSignal(false);
   const labelDropdownRef = useRef<HTMLDivElement>(null);
+  const showNotifications = useSignal(false);
+  const notificationDropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSearchChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -62,6 +70,112 @@ export function Header({ _stats = null }: IHeaderProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationDropdownRef.current &&
+        !notificationDropdownRef.current.contains(event.target as Node)
+      ) {
+        showNotifications.value = false;
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const notificationButton = (
+    <div class="relative" ref={notificationDropdownRef}>
+      <button
+        type="button"
+        onClick={() =>
+          showNotifications.value = !showNotifications.value}
+        class="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+        {getUnreadCount() > 0 && (
+          <span class="absolute top-0 right-0 w-4 h-4 text-xs flex items-center justify-center bg-red-500 text-white rounded-full">
+            {getUnreadCount()}
+          </span>
+        )}
+      </button>
+
+      {showNotifications.value && (
+        <div class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200/30 dark:border-gray-700/30 z-50">
+          <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                Notifications
+              </h3>
+              {notificationsSignal.value.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => clearAllNotifications()}
+                  class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+          </div>
+          <div class="max-h-96 overflow-y-auto">
+            {notificationsSignal.value.length === 0
+              ? (
+                <div class="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                  No notifications
+                </div>
+              )
+              : (
+                notificationsSignal.value.map((notification) => (
+                  <div
+                    key={notification.id}
+                    class={`p-4 border-b border-gray-100 dark:border-gray-700 ${
+                      notification.isRead ? "opacity-50" : ""
+                    }`}
+                    onClick={() => markAsRead(notification.id)}
+                  >
+                    <div class="flex items-center gap-3">
+                      <div
+                        class={`w-2 h-2 rounded-full ${
+                          notification.type === "exceeded"
+                            ? "bg-red-500"
+                            : notification.type === "warning"
+                            ? "bg-amber-500"
+                            : "bg-blue-500"
+                        }`}
+                      />
+                      <div class="flex-1">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                          {notification.title}
+                        </h4>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          {notification.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div
@@ -207,6 +321,7 @@ export function Header({ _stats = null }: IHeaderProps) {
         )}
 
         <div class="flex items-center gap-4">
+          {notificationButton}
           <HeaderControls onCardEdit={cardEditSignal.value} />
           <DarkModeToggle />
         </div>
