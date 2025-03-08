@@ -1,4 +1,3 @@
-import { JSX } from "preact";
 import { Card } from "../core/types/index.ts";
 import { TaskStateTypes } from "../core/types/TaskStateTypes.ts";
 import CardPreview from "./CardPreview.tsx";
@@ -27,7 +26,6 @@ interface DragIndicator {
 interface ColumnBoardProps {
   onDragStart: (card: Card, columnId: string) => void;
   onDragEnd: () => void;
-  onDragOver: (e: JSX.TargetedDragEvent<HTMLDivElement>) => void;
   onDrop: (columnId: string) => void;
   onCardEdit: (card: Card, columnId: string) => void;
   onCardDelete: (card: Card, columnId: string) => void;
@@ -40,7 +38,6 @@ interface ColumnBoardProps {
 export default function ColumnBoard({
   onDragStart,
   onDragEnd,
-  onDragOver,
   onDrop,
   onCardEdit,
   onCardDelete,
@@ -104,8 +101,8 @@ export default function ColumnBoard({
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const handleDragOver = (
@@ -179,11 +176,17 @@ export default function ColumnBoard({
                 onDragOver={(e) => handleColumnDragOver(e, column.id)}
                 onDrop={(e) => {
                   e.preventDefault();
-                  if (dragIndicator && draggedCard) {
+                  if (dragIndicator && draggedCard && draggedCard.id) {
                     onDrop(column.id);
                     // Handle reordering after column change
                     setTimeout(() => {
-                      onReorder(column.id, draggedCard.id, dragIndicator.index);
+                      if (draggedCard.id) {
+                        onReorder(
+                          column.id,
+                          draggedCard.id,
+                          dragIndicator.index,
+                        );
+                      }
                     }, 0);
                   }
                   setDragIndicator(null);
@@ -289,7 +292,7 @@ export default function ColumnBoard({
                               isLabelsCollapsed={isLabelsCollapsed}
                               onLabelClick={() =>
                                 onLabelsCollapse(!isLabelsCollapsed)}
-                              onDragStart={(e) => {
+                              onDragStart={() => {
                                 setDraggedCard(card);
                                 onDragStart(card, column.id);
 
@@ -301,7 +304,7 @@ export default function ColumnBoard({
                                   ghost.style.top = "-1000px";
                                   ghost.style.opacity = "0.8";
                                   document.body.appendChild(ghost);
-                                  e.dataTransfer?.setDragImage(ghost, 0, 0);
+                                  // e.dataTransfer?.setDragImage(ghost, 0, 0);
                                   setTimeout(() => ghost.remove(), 0);
                                 }
                               }}

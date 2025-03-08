@@ -1,12 +1,12 @@
-import { Card, AuditEntry } from "../types/shared.ts";
+import { AuditEntry, Card } from "../types/shared.ts";
 import { createAuditEntry } from "../utils/auditUtils.ts";
 
 type TrackableField = keyof Card | string;
 
 interface FieldConfig {
   displayName: string;
-  compareFunction?: (oldValue: any, newValue: any) => boolean;
-  formatValue?: (value: any) => string;
+  compareFunction?: (oldValue: unknown, newValue: unknown) => boolean;
+  formatValue?: (value: unknown) => string;
 }
 
 const fieldConfigurations: Record<TrackableField, FieldConfig> = {
@@ -20,25 +20,25 @@ const fieldConfigurations: Record<TrackableField, FieldConfig> = {
   },
   labels: {
     displayName: "Labels",
-    compareFunction: (old, next) => 
+    compareFunction: (old, next) =>
       JSON.stringify(old || []) === JSON.stringify(next || []),
     formatValue: (value) => JSON.stringify(value || []),
   },
   checklist: {
     displayName: "Checklist",
-    compareFunction: (old, next) => 
+    compareFunction: (old, next) =>
       JSON.stringify(old || []) === JSON.stringify(next || []),
     formatValue: (value) => JSON.stringify(value || []),
   },
   meetings: {
     displayName: "Meetings",
-    compareFunction: (old, next) => 
+    compareFunction: (old, next) =>
       JSON.stringify(old || []) === JSON.stringify(next || []),
     formatValue: (value) => JSON.stringify(value || []),
   },
   dueDate: {
     displayName: "Due Date",
-    formatValue: (value) => value || "Not set",
+    formatValue: (value) => value?.toString() || "Not set",
   },
   estimatedTime: {
     displayName: "Estimated Time",
@@ -46,13 +46,13 @@ const fieldConfigurations: Record<TrackableField, FieldConfig> = {
   },
   github: {
     displayName: "GitHub Settings",
-    compareFunction: (old, next) => 
+    compareFunction: (old, next) =>
       JSON.stringify(old || {}) === JSON.stringify(next || {}),
     formatValue: (value) => JSON.stringify(value || {}),
   },
   relatedItems: {
     displayName: "Related Items",
-    compareFunction: (old, next) => 
+    compareFunction: (old, next) =>
       JSON.stringify(old || []) === JSON.stringify(next || []),
     formatValue: (value) => JSON.stringify(value || []),
   },
@@ -60,20 +60,20 @@ const fieldConfigurations: Record<TrackableField, FieldConfig> = {
 
 export class ChangeTrackingService {
   private static hasFieldChanged(
-    oldValue: any,
-    newValue: any,
+    oldValue: unknown,
+    newValue: unknown,
     field: TrackableField,
   ): boolean {
     const config = fieldConfigurations[field];
-    
+
     if (config?.compareFunction) {
       return !config.compareFunction(oldValue, newValue);
     }
-    
+
     return oldValue !== newValue;
   }
 
-  private static formatValue(value: any, field: TrackableField): string {
+  private static formatValue(value: unknown, field: TrackableField): string {
     const config = fieldConfigurations[field];
     if (config?.formatValue) {
       return config.formatValue(value);
@@ -92,13 +92,13 @@ export class ChangeTrackingService {
 
       if (this.hasFieldChanged(oldValue, newValue, typedField)) {
         const config = fieldConfigurations[typedField];
-        
+
         auditEntries.push(
           createAuditEntry("update", {
             field: config.displayName,
             oldValue: this.formatValue(oldValue, typedField),
             newValue: this.formatValue(newValue, typedField),
-          })
+          }),
         );
       }
     });
@@ -108,7 +108,7 @@ export class ChangeTrackingService {
 
   static addCustomTrackableField(
     field: string,
-    config: FieldConfig
+    config: FieldConfig,
   ): void {
     fieldConfigurations[field] = config;
   }
@@ -117,10 +117,10 @@ export class ChangeTrackingService {
 // Helper function to apply tracked changes
 export const applyTrackedChanges = (
   oldCard: Card,
-  newCard: Card
+  newCard: Card,
 ): Card => {
   const auditEntries = ChangeTrackingService.trackChanges(oldCard, newCard);
-  
+
   return {
     ...newCard,
     auditHistory: [

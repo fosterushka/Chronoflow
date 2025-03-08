@@ -69,7 +69,9 @@ export function checkTimeThresholds(card: Card) {
   if (card.id && !shownWarnings.has(card.id)) {
     shownWarnings.set(card.id, new Set());
   }
-  const cardWarnings = shownWarnings.get(card.id)!;
+  if (!card.id) return;
+  const cardWarnings = shownWarnings.get(card.id);
+  if (!cardWarnings) return;
 
   // Only show exceeded warning if we haven't shown it before
   if (totalTime >= estimatedSeconds && !cardWarnings.has("exceeded")) {

@@ -22,7 +22,6 @@ import Portal from "../components/Portal.tsx";
 import {
   checkTimeThresholds,
   initializeNotifications,
-  timeWarningSignal,
 } from "../core/signals/timeSignals.ts";
 
 export const convertModalCardToBoardCard = (modalCard: ModalCard): Card => {
@@ -242,13 +241,6 @@ export default function Board() {
     };
   }, []);
 
-  const currentWarning = timeWarningSignal.value;
-  const warningCard = currentWarning.cardId
-    ? columnsSignal.value
-      .flatMap((col) => col.cards)
-      .find((card) => card.id === currentWarning.cardId)
-    : null;
-
   return (
     <ErrorBoundary
       fallback={(error) => (
@@ -276,9 +268,6 @@ export default function Board() {
           }}
           onDragEnd={() => {
             draggedCardSignal.value = null;
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
           }}
           onDrop={(columnId) => {
             if (draggedCardSignal.value) {
