@@ -9,11 +9,10 @@ export default function MobileWarningModal(
   if (!isOpen) return null;
 
   return (
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 transform transition-all duration-300 ease-out animate-fade-scale-up">
-        {/* Warning Icon */}
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+      <div class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-2xl transform transition-all duration-300 animate-fade-scale-up">
         <div class="relative">
-          <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30 rounded-full flex items-center justify-center shadow-lg transform-gpu animate-float">
+          <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-24 h-24 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30 rounded-full flex items-center justify-center shadow-lg transform-gpu animate-float">
             <svg
               class="w-12 h-12 text-amber-500 dark:text-amber-400 transform-gpu animate-pulse-subtle"
               fill="none"
@@ -34,9 +33,9 @@ export default function MobileWarningModal(
           <h3 class="text-2xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-400 dark:to-orange-400 mb-4">
             Desktop Version Recommended
           </h3>
-          <p class="text-base text-center leading-relaxed text-gray-600 dark:text-gray-400">
+          <p class="text-base text-center leading-relaxed text-gray-600 dark:text-gray-300">
             Since Chronoflow is in early development, we are currently focused
-            on the desktop version. Some features might be unavailable or work
+            on the desktop experience. Some features might be limited or behave
             differently on mobile devices.
           </p>
         </div>
@@ -45,9 +44,9 @@ export default function MobileWarningModal(
           <button
             type="button"
             onClick={onClose}
-            class="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] animate-pulse-subtle"
+            class="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium rounded-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg"
           >
-            Got it
+            Continue Anyway
           </button>
         </div>
       </div>

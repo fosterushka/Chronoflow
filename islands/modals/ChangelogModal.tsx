@@ -89,118 +89,99 @@ export default function ChangelogModal(
   if (!isOpen) return null;
 
   return (
-    <div class="fixed inset-0 z-[100] overflow-y-auto w-full h-full">
-      <div class="flex items-center justify-center min-h-screen px-4 py-8">
+    <div class="fixed inset-0 z-[100] overflow-y-auto">
+      <div class="min-h-screen px-4 text-center">
         <div
-          class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+          class="fixed inset-0 bg-black/60 backdrop-blur-sm"
           onClick={onClose}
-        >
-        </div>
-        <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col transform transition-all duration-300 ease-out animate-fade-scale-up">
-          {/* Header */}
-          <div class="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center">
+        />
+
+        <div class="inline-block w-full max-w-2xl my-8 text-left align-middle transition-all transform">
+          <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl">
+            {/* Header */}
+            <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 flex items-center justify-center">
+                  <svg
+                    class="w-6 h-6 text-blue-500 dark:text-blue-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500">
+                  What's New
+                </h2>
+              </div>
+              <button
+                onClick={onClose}
+                class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
                 <svg
-                  class="w-5 h-5 text-blue-500 dark:text-blue-400"
+                  class="w-5 h-5"
+                  viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  viewBox="0 0 24 24"
                 >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </div>
-              <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500">
-                Changelog
-              </h2>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
 
-          {/* Content */}
-          <div class="overflow-y-auto flex-1 px-6">
-            <div class="space-y-8 py-6">
-              {changelog.map((release, releaseIndex) => (
-                <div
-                  key={release.version}
-                  class={`relative ${
-                    releaseIndex !== changelog.length - 1
-                      ? "pb-8 before:absolute before:left-[11px] before:top-[30px] before:h-full before:w-0.5 before:bg-gray-200 dark:before:bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  <div class="flex gap-6">
-                    {/* Version Dot */}
-                    <div class="relative z-10 w-6 h-6 rounded-full bg-blue-500 dark:bg-blue-400 flex items-center justify-center ring-8 ring-white dark:ring-gray-800 transition-transform duration-200 hover:scale-110">
-                      <svg
-                        class="w-3 h-3 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <circle cx="8" cy="8" r="3" />
-                      </svg>
-                    </div>
-
-                    {/* Version Content */}
-                    <div class="flex-1">
-                      <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-                          Version {release.version}
-                        </h3>
-                        <span class="px-2.5 py-0.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-full">
-                          {release.date}
-                        </span>
+            {/* Content */}
+            <div class="overflow-y-auto max-h-[60vh] p-6">
+              <div class="space-y-12">
+                {changelog.map((release, index) => (
+                  <div key={release.version} class="relative">
+                    <div class="flex gap-6">
+                      <div class="relative">
+                        <div class="w-4 h-4 rounded-full bg-blue-500 dark:bg-blue-400 ring-4 ring-blue-50 dark:ring-blue-900" />
+                        {index !== changelog.length - 1 && (
+                          <div class="absolute top-4 bottom-0 left-2 w-0.5 -translate-x-1/2 bg-gray-200 dark:bg-gray-700" />
+                        )}
                       </div>
-                      <ul class="space-y-2">
-                        {release.changes.map((change, index) => (
-                          <li
-                            key={index}
-                            class="flex items-start gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
-                          >
-                            <svg
-                              class="w-5 h-5 mt-0.5 flex-shrink-0 text-blue-500 dark:text-blue-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                      <div class="flex-1 -mt-1">
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                            Version {release.version}
+                          </h3>
+                          <span class="px-2.5 py-0.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-full">
+                            {release.date}
+                          </span>
+                        </div>
+                        <div class="prose dark:prose-invert max-w-none">
+                          {release.changes.map((change, changeIndex) => (
+                            <div
+                              key={changeIndex}
+                              class="text-gray-600 dark:text-gray-300"
                             >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 12l2 2 4-4"
-                              />
-                            </svg>
-                            <span>{change}</span>
-                          </li>
-                        ))}
-                      </ul>
+                              {change.startsWith("-")
+                                ? <div class="ml-6 my-1">{change}</div>
+                                : (
+                                  <div class="font-medium mt-4 first:mt-0">
+                                    {change}
+                                  </div>
+                                )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
