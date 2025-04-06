@@ -1,5 +1,6 @@
-import type { Column, Label } from "../types/index.ts";
+import type { Column } from "../types/index.ts";
 import { columnsSignal } from "../signals/boardSignals.ts";
+import { Card } from "../types/ICardModal.ts";
 
 export const BOARD_UPDATE_EVENT = "board-update";
 
@@ -9,14 +10,7 @@ export const dispatchBoardUpdate = (columns: Column[]) => {
   );
 };
 
-export const LABELS: Label[] = [
-  { id: "bug", name: "Bug", color: "bg-red-500" },
-  { id: "feature", name: "Feature", color: "bg-blue-500" },
-  { id: "enhancement", name: "Enhancement", color: "bg-green-500" },
-  { id: "documentation", name: "Documentation", color: "bg-purple-500" },
-  { id: "design", name: "Design", color: "bg-yellow-500" },
-  { id: "refactor", name: "Refactor", color: "bg-orange-500" },
-];
+// Labels are now managed in labelSignals.ts
 
 export const COLUMNS: Omit<Column, "cards">[] = [
   { id: "todo", title: "To Do" },
@@ -69,7 +63,7 @@ export function importData(
         Array.isArray(data) &&
         data.every((col) =>
           col.id && col.title && Array.isArray(col.cards) &&
-          col.cards.every((card: any) => card.id && card.title)
+          col.cards.every((card: Card) => card.id && card.title)
         )
       ) {
         // Initialize timeSpent and other missing properties
@@ -79,7 +73,7 @@ export function importData(
             ...card,
             timeSpent: card.timeSpent || 0,
             isTracking: false,
-            lastTrackingStart: undefined,
+            lastTrackingStart: Date.now(),
             currentElapsedTime: 0,
           })),
         }));

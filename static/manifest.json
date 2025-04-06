@@ -19,5 +19,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "permissions": ["notifications"]
 }

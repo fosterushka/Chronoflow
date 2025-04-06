@@ -1,72 +1,54 @@
-# Chronoflow 🚀
+<div align="center">
 
-I start this project with the goal of creating a tool for myself. But it turned
-out to be a lot more than that.
+# Chronoflow ⚡
 
-A task management application designed for development teams, featuring advanced
-time tracking, Git integration, and workflow optimization.
+A powerful task management system for development teams, combining time
+tracking, Git integration, and workflow optimization.
 
-# Demo is available at [Chronoflow](https://chronoflow.deno.dev/)
+[Live Demo](https://chronoflow.deno.dev/) |
+[Contribuation](./CODE_OF_CONDUCT.md) | [Changelog](./CHANGELOG.md)
 
-## ✨ Key Features
+</div>
 
-### 🎯 Task Management
+## 🌟 Core Features
 
-- Five-stage workflow: Todo → In Progress → Code Review → Testing → Done
-- Drag-and-drop task movement
-- Real-time task count and statistics
-- Checklists and subtasks
-- File attachments and organization
+### Task Management
 
-### ⏱️ Time Tracking
+- **Workflow Stages**: Todo → In Progress → Code Review → Testing → Done
+- **Smart Organization**: Drag-and-drop interface, real-time statistics
+- **Task Details**: Checklists, subtasks, file attachments
 
-- Real-time tracking with visual indicators
-- Estimated vs actual time comparison
-- Automatic time logging
-- Progress visualization
-- Time-based analytics
+### Time Tracking
 
-### 🐙 Git Integration
+- **Real-time Monitoring**: Visual indicators and progress tracking
+- **Time Analysis**: Compare estimated vs actual time
+- **Insights**: Time-based analytics and reporting
 
-- Repository linking and issue creation
-- Contributor management
-- Assignee selection
-- Pull request tracking
-- Issue templates
+### Git Integration
 
-### 🎥 Meeting Management
+- **Seamless Workflow**: Direct repository linking and issue creation
+- **Team Collaboration**: Contributor management and assignee selection
+- **Progress Tracking**: Pull request monitoring and issue templates
 
-- Integration with Zoom, Teams, and Google Meet
-- Meeting scheduling and tracking
-- Notes and documentation
-- Calendar integration
+### Meeting Management
 
-### 🏷️ Organization
+- **Video Integration**: Support for Zoom, Teams, and Google Meet
+- **Organization**: Meeting scheduling, notes, and calendar integration
 
-- Custom labels and categories
-- File management system
-- Task templates
-- Advanced filtering
+## 🚀 Quick Start
 
-### 📊 Analytics & Reports
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/chronoflow.git
 
-- Time tracking analytics
-- Task completion metrics
-- Progress visualization
-- Performance insights
+# Install dependencies
+deno task install
 
-## 🚀 Getting Started
+# Start development server
+deno task start
+```
 
-1. Clone the repository
-2. Install dependencies: `deno task install`
-3. Start the development server: `deno task start`
-
-## 📝 Documentation
-
-- [Changelog](./CHANGELOG.md)
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
-
-## 🐛 Known Limitations
+## ⚠️ Current Limitations
 
 - Local storage only (server-side storage coming soon)
 - No user authentication (planned for next release)
@@ -77,8 +59,8 @@ time tracking, Git integration, and workflow optimization.
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE.md)
 file for details.
 
-## 🙏 Acknowledgments
+<div align="center">
 
-- Built with [Fresh](https://fresh.deno.dev/)
-- UI powered by [Tailwind CSS](https://tailwindcss.com/)
-- Icons from [Heroicons](https://heroicons.com/)
+[![Made with Fresh](https://fresh.deno.dev/fresh-badge-dark.svg)](https://fresh.deno.dev)
+
+</div>
