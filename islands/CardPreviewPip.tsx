@@ -25,11 +25,17 @@ export default function CardPreviewPip({
   const timeIntervalRef = useRef<number | null>(null);
   const updateTimeRef = useRef<(() => void) | null>(null);
   const [cardState, setCardState] = useState(card);
+  const latestCardStateRef = useRef(cardState);
 
   // Update the local card state when the prop changes
   useEffect(() => {
     setCardState(card);
   }, [card]);
+
+  // Keep the ref updated with the latest card state
+  useEffect(() => {
+    latestCardStateRef.current = cardState;
+  }, [cardState]);
 
   // Effect to update PiP window when card state or elapsed time changes
   useEffect(() => {
@@ -314,8 +320,8 @@ export default function CardPreviewPip({
     const updateTime = () => {
       if (!pipWindow || pipWindow.closed) return;
 
-      // Get the latest card state
-      const currentCard = cardState;
+      // Get the latest card state from the ref
+      const currentCard = latestCardStateRef.current;
 
       // Calculate current elapsed time
       let displayTime = currentCard.timeSpent ?? 0;
