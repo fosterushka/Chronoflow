@@ -2,6 +2,15 @@
 
 All notable changes to Chronoflow will be documented in this file.
 
+## [v0.0.6a] - 2025-04-18
+
+### 🎨 Enhancements
+
+- Added emoji picker support for text inputs
+- Enhanced changelog documentation and visualization
+- Improved input handling with cursor position preservation
+- Added auto-scrolling for new checklist items
+
 ## [v0.0.5] - 2025-03-09
 
 ### 🎨 Worksapce boards, Filtering, PIP and much more.
@@ -11,8 +20,8 @@ All notable changes to Chronoflow will be documented in this file.
 - Enhanced state management system
 - Improved popup windows rendering using portals
 - Added experimental features toggle
-  - Column collapse functionality
-  - Global task filtering system (search and labels)
+- Column collapse functionality
+- Global task filtering system (search and labels)
 - Added tracked task preview in header
 - Enhanced dark theme UI
 - Major code refactoring and cleanup
