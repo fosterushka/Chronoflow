@@ -1,6 +1,16 @@
 # Changelog
 
-All notable changes to Chronoflow will be documented in this file.
+## [v0.0.6b3] - 2025-06-22
+
+### 🎨 Workspace boards,Optimizations
+
+- Add workspace switcher with management
+- Popup modal optimization and unified
+- Centralize storage logic
+- Fix workspace columns initialization
+- Fix archive per workspace and preserve tracking
+- Fix icons
+- Optimization
 
 ## [v0.0.6a] - 2025-04-18
 
